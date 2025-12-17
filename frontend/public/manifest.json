@@ -1,0 +1,17 @@
+{
+  "name": "SkillForgeAI",
+  "short_name": "SkillForge",
+  "description": "Master DSA, ace interviews, and land your dream job with AI-powered coaching",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#030712",
+  "theme_color": "#7c3aed",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

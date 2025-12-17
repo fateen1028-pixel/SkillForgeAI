@@ -1,0 +1,5 @@
+// Zustand store placeholder for skill/onboarding state
+export const useSkillStore = () => ({
+  selectedSkills: [],
+  experienceLevel: null,
+});
