@@ -34,8 +34,8 @@ class RegisterRequest(BaseModel):
 
 class UserSetupRequest(BaseModel):
     goal: str
-    skills: List[str]
-    languages: List[str]
+    goals: List[str]
+    prior_exposure_languages: List[str]
     time_availability: str
     experience_level: str
 

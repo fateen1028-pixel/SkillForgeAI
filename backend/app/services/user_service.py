@@ -27,17 +27,23 @@ async def setup_user_skills(db, user_id: str, setup_payload: UserSetupRequest):
             detail="Setup already completed"
         )
     
-    # 3 & 4. Save preferences and mark setup completed
-    setup_data = {
+    # 3. Save setup_profile to user_learning_state
+    from app.services import learning_state_service
+    setup_profile = {
         "goal": setup_payload.goal,
-        "skills": setup_payload.skills,
-        "languages": setup_payload.languages,
+        "goals": setup_payload.goals,
+        "prior_exposure_languages": setup_payload.prior_exposure_languages,
         "time_availability": setup_payload.time_availability,
         "experience_level": setup_payload.experience_level,
     }
-    
-    await user_repo.update_user_setup(db, user_id, setup_data)
-    
+    await learning_state_service.create_initial_learning_state(
+        db=db,
+        user_id=user_id,
+        roadmap_id=None,
+        setup_profile=setup_profile
+    )
+    # 4. Mark setup as completed in users collection
+    await user_repo.update_user_setup(db, user_id, {})
     return {
         "message": "Setup completed successfully",
         "is_setup_completed": True

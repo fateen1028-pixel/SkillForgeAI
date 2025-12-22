@@ -1,11 +1,18 @@
 from fastapi import Depends, Cookie, HTTPException, status
-from app.utils.security import decode_access_token,decode_token
+import jwt
+
+from app.utils.security import decode_token
 from app.db.user_repo import get_user_by_id
 from app.db.base import get_database
-import jwt
+from app.db.user_roadmap_repo import UserRoadmapRepo
+
+
+async def get_db():
+    return get_database()
 
 async def get_current_user(
     access_token: str | None = Cookie(default=None),
+    db = Depends(get_db),
 ):
     if not access_token:
         raise HTTPException(
@@ -21,7 +28,6 @@ async def get_current_user(
             detail="ACCESS_TOKEN_EXPIRED",
         )
 
-    db = get_database()
     user = await get_user_by_id(db, user_id)
 
     if not user:
@@ -33,6 +39,6 @@ async def get_current_user(
     return user
 
 
-def get_db():
-    return get_database()
 
+def get_user_roadmap_repo(db = Depends(get_db)):
+    return UserRoadmapRepo(db)

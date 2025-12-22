@@ -30,17 +30,6 @@ const NEXT_ACTION = {
 // Tab configuration - Only keeping core features
 const TABS = [
   { 
-    id: "chatbot", 
-    label: "AI Assistant", 
-    description: "Chat with your AI mentor",
-    href: "/dashboard/chatbot",
-    icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-      </svg>
-    )
-  },
-  { 
     id: "tasks", 
     label: "Tasks", 
     description: "Track your daily goals",
@@ -148,7 +137,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="container-app py-4 md:py-6 lg:py-8">
+    <div className="container-app py-6 md:py-10 lg:py-14 max-w-5xl mx-auto">
       {/* Back to Home */}
       <Link
         href="/"
@@ -161,16 +150,16 @@ export default function DashboardPage() {
       </Link>
 
       {/* Quick Navigation - Core Features Only */}
-      <div className={`mb-6 md:mb-8 transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-        <div className="flex items-center gap-2 mb-3 md:mb-4">
-          <div className="w-6 h-6 md:w-7 md:h-7 rounded-lg bg-linear-to-br from-violet-500 to-purple-600 flex items-center justify-center">
-            <svg className="w-3.5 h-3.5 md:w-4 md:h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className={`mb-10 md:mb-14 transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+        <div className="flex items-center gap-3 mb-5 md:mb-7">
+          <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg">
+            <svg className="w-4 h-4 md:w-5 md:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
           </div>
-          <h2 className="text-sm md:text-base font-bold text-white">Quick Access</h2>
+          <h2 className="text-lg md:text-xl font-extrabold text-white tracking-tight">Quick Access</h2>
         </div>
-        <div className="grid grid-cols-3 gap-2 md:gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
           {TABS.map((tab, index) => {
             const colors = [
               { border: 'border-violet-500/30 hover:border-violet-500/50', bg: 'from-violet-500/15 to-purple-500/5', icon: 'from-violet-500 to-purple-600', text: 'text-violet-400' },
@@ -182,16 +171,16 @@ export default function DashboardPage() {
               <Link
                 key={tab.id}
                 href={tab.href}
-                className={`group relative flex flex-col md:flex-row items-center md:items-center gap-2 md:gap-4 p-3 md:p-4 rounded-xl md:rounded-2xl border ${color.border} bg-linear-to-br ${color.bg} hover:bg-white/8 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-black/20`}
+                className={`group relative flex flex-col items-center justify-center gap-3 p-5 md:p-6 rounded-2xl border ${color.border} bg-gradient-to-br ${color.bg} hover:bg-white/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/20 w-full min-h-[120px] md:min-h-[140px]`}
               >
-                <div className={`w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-linear-to-br ${color.icon} flex items-center justify-center text-white shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
+                <div className={`w-12 h-12 md:w-14 md:h-14 rounded-xl bg-gradient-to-br ${color.icon} flex items-center justify-center text-white shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
                   {tab.icon}
                 </div>
-                <div className="text-center md:text-left">
-                  <h3 className="text-xs md:text-sm font-semibold text-white">{tab.label}</h3>
-                  <p className="hidden md:block text-xs text-slate-400">{tab.description}</p>
+                <div className="text-center w-full">
+                  <h3 className="text-lg md:text-xl font-extrabold text-white mb-1 tracking-tight">{tab.label}</h3>
+                  <p className="text-xs md:text-sm text-slate-300 font-medium">{tab.description}</p>
                 </div>
-                <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-linear-to-r from-white/40 to-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                {/* Decorative dot removed for cleaner look */}
               </Link>
             );
           })}

@@ -114,8 +114,8 @@ export default function SetupPage() {
     
     const setupData = {
       goal: selectedGoal,
-      skills: selectedSkills,
-      languages: knownLanguages,
+      goals: selectedSkills,
+      prior_exposure_languages: knownLanguages,
       time_availability: timeAvailability,
       experience_level: experienceLevel,
     };

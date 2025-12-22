@@ -1,11 +1,11 @@
-from domain.skill import SkillVector,SkillName
+from domain.skill import SkillName
 
 def apply_skill_update(
-    skill_vector: SkillVector,
+    skill_dict: dict,
     skill: SkillName,
     delta: float
-) -> SkillVector:
-    current = getattr(skill_vector, skill.value)
+) -> dict:
+    current = skill_dict.get(skill.value, 0.0)
     new_value = min(max(current + delta, 0.0), 1.0)
-    setattr(skill_vector, skill.value, new_value)
-    return skill_vector
+    skill_dict[skill.value] = new_value
+    return skill_dict

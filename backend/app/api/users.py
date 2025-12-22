@@ -37,7 +37,5 @@ async def get_user_profile(user=Depends(get_current_user)):
         "email": user["email"],
         "name": user.get("name"),
         "is_setup_completed": user.get("is_setup_completed", False),
-        "setup_profile": user.get("setup_profile"),
-        "skill_vector": user.get("skill_vector"),
         "created_at": user.get("created_at"),
     }

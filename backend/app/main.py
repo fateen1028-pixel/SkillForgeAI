@@ -6,9 +6,10 @@ from app.api.tasks import router as tasks_router
 from app.api.register import router as register_router
 from app.api.users import router as users_router
 from app.db.base import close_client
-# from app.api.roadmap import router as roadmap_router
 from contextlib import asynccontextmanager
-
+from app.api.roadmap import router as roadmap_router
+from app.api.roadmap_slot import router as roadmap_slot_router
+from app.api.slots import router as slots_router
 
 
 @asynccontextmanager
@@ -25,7 +26,9 @@ app.include_router(login_router)
 app.include_router(register_router)
 app.include_router(tasks_router)
 app.include_router(users_router,prefix="/api",tags=["users"])
-# app.include_router(roadmap_router, prefix="/roadmap", tags=["Roadmap"])
+app.include_router(roadmap_router)
+app.include_router(roadmap_slot_router)
+app.include_router(slots_router, prefix="/roadmap", tags=["slots"])
 
 app.add_middleware(
     CORSMiddleware,

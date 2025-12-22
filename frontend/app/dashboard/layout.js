@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 // Navigation items shared between mobile and desktop
 const NAV_ITEMS = [
@@ -13,16 +14,6 @@ const NAV_ITEMS = [
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-      </svg>
-    ),
-  },
-  {
-    id: "chatbot",
-    href: "/dashboard/chatbot",
-    label: "AI Chat",
-    icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
       </svg>
     ),
   },
@@ -60,10 +51,14 @@ const NAV_ITEMS = [
   },
 ];
 
+
 export default function DashboardLayout({ children }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileRef = useRef(null);
+  const [userProfile, setUserProfile] = useState(null);
+  const { logout } = useAuth();
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -74,6 +69,29 @@ export default function DashboardLayout({ children }) {
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Fetch user profile on mount
+  useEffect(() => {
+    async function getProfile() {
+      // Use the same fetchGeneralProfile helper as dashboard
+      const APP_URL = process.env.NEXT_PUBLIC_APP_URL;
+      async function fetchGeneralProfile() {
+        try {
+          const res = await fetch(`${APP_URL}/api/general_profile`, {
+            credentials: "include",
+          });
+          if (!res.ok) throw new Error("Failed to fetch user profile");
+          return await res.json();
+        } catch (err) {
+          console.error("Error fetching user profile:", err);
+          return null;
+        }
+      }
+      const profile = await fetchGeneralProfile();
+      setUserProfile(profile);
+    }
+    getProfile();
   }, []);
 
   // Check if current path matches nav item
@@ -138,7 +156,7 @@ export default function DashboardLayout({ children }) {
               {/* User profile with dropdown */}
               <div className="flex items-center gap-2 md:gap-3" ref={profileRef}>
                 <div className="hidden md:block text-right">
-                  <p className="text-sm font-semibold text-white">Demo User</p>
+                  <p className="text-sm font-semibold text-white">{userProfile?.name || userProfile?.email || "User"}</p>
                   <p className="text-[11px] text-slate-500">Pro Member</p>
                 </div>
                 <div className="relative">
@@ -148,7 +166,7 @@ export default function DashboardLayout({ children }) {
                   >
                     <div className="absolute -inset-0.5 bg-linear-to-r from-violet-600 to-cyan-500 rounded-full blur opacity-0 group-hover:opacity-50 transition-opacity duration-300" />
                     <div className="relative w-8 h-8 md:w-10 md:h-10 rounded-full bg-linear-to-br from-violet-500 to-cyan-500 flex items-center justify-center text-xs md:text-sm font-bold ring-2 ring-white/10 group-hover:ring-white/20 transition-all">
-                      DU
+                      {userProfile?.name ? userProfile.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2) : "U"}
                     </div>
                   </button>
 
@@ -159,11 +177,11 @@ export default function DashboardLayout({ children }) {
                       <div className="p-4 border-b border-white/6 bg-linear-to-br from-violet-500/10 to-cyan-500/5">
                         <div className="flex items-center gap-3">
                           <div className="w-12 h-12 rounded-full bg-linear-to-br from-violet-500 to-cyan-500 flex items-center justify-center text-sm font-bold">
-                            DU
+                            {userProfile?.name ? userProfile.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2) : "U"}
                           </div>
                           <div>
-                            <p className="font-semibold text-white">Demo User</p>
-                            <p className="text-xs text-slate-400">demo@skillforgeai.com</p>
+                            <p className="font-semibold text-white">{userProfile?.name || userProfile?.email || "User"}</p>
+                            <p className="text-xs text-slate-400">{userProfile?.email || "user@email.com"}</p>
                           </div>
                         </div>
                         <div className="mt-3 flex items-center gap-2">
@@ -221,16 +239,19 @@ export default function DashboardLayout({ children }) {
 
                       {/* Logout Section */}
                       <div className="p-2 border-t border-white/6">
-                        <Link
-                          href="/"
-                          onClick={() => setIsProfileOpen(false)}
+                        <button
+                          onClick={async () => {
+                            setIsProfileOpen(false);
+                            await logout();
+                            router.push("/");
+                          }}
                           className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 transition-all group w-full"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                           </svg>
                           <span>Log Out</span>
-                        </Link>
+                        </button>
                       </div>
                     </div>
                   )}
