@@ -193,3 +193,4 @@ async def update_user_learning_state(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User learning state not found",
         )
+    return result

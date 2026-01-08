@@ -2,19 +2,25 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function ProtectedRoute({ children }) {
   const router = useRouter();
+  const { isAuthenticated, loading } = useAuth();
 
   useEffect(() => {
-    // Placeholder for auth check
-    // In production, check auth state from store/cookies
-    const isAuthenticated = true; // For demo, always true
-    
-    if (!isAuthenticated) {
+    if (!loading && !isAuthenticated) {
       router.push("/auth/login");
     }
-  }, [router]);
+  }, [isAuthenticated, loading, router]);
+
+  if (loading) {
+    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return children;
 }

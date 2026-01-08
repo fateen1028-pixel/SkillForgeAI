@@ -7,6 +7,7 @@ class EvidenceSummary(BaseModel):
     total_events: int = 0
     weighted_score: float = 0.0
     last_event_id: Optional[str] = None
+    last_prompt_version: Optional[str] = None # V2.5.3.1: Evaluator Compatibility
 
 class SourceMix(BaseModel):
     priors: float = 1.0

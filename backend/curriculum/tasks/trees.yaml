@@ -1,0 +1,105 @@
+skill: trees
+version: v1
+description: >
+  Tree curriculum focused on hierarchical memory, recursive decomposition,
+  branching invariants, and traversal state.
+
+slots:
+
+# =========================================================
+# SLOT 1 — NODE HIERARCHY MODEL
+# =========================================================
+
+  - slot_id: TREE_SLOT_1_STRUCTURE
+    mental_install: "Trees organize data hierarchically via parent-child relations."
+    invariant: "Each node defines an independent subproblem."
+    mastery_signals:
+      - Explains root, child, leaf
+      - Models recursion
+    hard_failures:
+      - Treats trees as arrays
+      - Cannot trace structure
+
+    templates:
+      - id: tree_s1_depth
+        type: explanation
+        difficulty: easy
+        prompt: |
+          Explain what a tree is and why recursion fits it naturally.
+        rubric: "Must reference subtrees and hierarchical structure."
+        concepts: [hierarchy, recursion]
+
+# =========================================================
+# SLOT 2 — TRAVERSAL STATES
+# =========================================================
+
+  - slot_id: TREE_SLOT_2_TRAVERSAL
+    mental_install: "Traversal order defines meaning."
+    invariant: "Each traversal preserves a specific structural promise."
+    mastery_signals:
+      - Implements preorder/inorder/postorder
+      - Explains differences
+    hard_failures:
+      - Confuses orders
+      - Breaks visitation logic
+
+    templates:
+      - id: tree_s2_traversal
+        type: coding
+        difficulty: medium
+        prompt: "Return inorder traversal of binary tree."
+        language: python
+        starter_code: |
+          def inorder(root):
+              pass
+        concepts: [dfs, traversal]
+
+# =========================================================
+# SLOT 3 — STRUCTURAL COMPUTATION
+# =========================================================
+
+  - slot_id: TREE_SLOT_3_PROPERTIES
+    mental_install: "Tree properties emerge from recursive aggregation."
+    invariant: "Parent properties derive from children."
+    mastery_signals:
+      - Computes height
+      - Computes diameter
+    hard_failures:
+      - Uses globals blindly
+      - Cannot justify recurrence
+
+    templates:
+      - id: tree_s3_height
+        type: coding
+        difficulty: medium
+        prompt: "Compute height of binary tree."
+        language: python
+        starter_code: |
+          def height(root):
+              pass
+        concepts: [recursion, aggregation]
+
+# =========================================================
+# SLOT 4 — ORDERED TREES (BST)
+# =========================================================
+
+  - slot_id: TREE_SLOT_4_BST
+    mental_install: "BSTs impose ordering invariants enabling logarithmic decisions."
+    invariant: "Left < Node < Right holds for all subtrees."
+    mastery_signals:
+      - Validates BST
+      - Uses ordered traversal
+    hard_failures:
+      - Breaks invariant
+      - Treats as normal tree
+
+    templates:
+      - id: tree_s4_validate
+        type: coding
+        difficulty: hard
+        prompt: "Validate a binary search tree."
+        language: python
+        starter_code: |
+          def isValidBST(root):
+              pass
+        concepts: [ordered_structure, invariants]

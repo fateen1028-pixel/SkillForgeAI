@@ -1,8 +1,8 @@
-from passlib.context import CryptContext
+﻿from passlib.context import CryptContext
 from datetime import datetime, timedelta, timezone
 import jwt
-from fastapi import HTTPException, status
 from app.core.config import settings
+from app.core.exceptions import TokenExpiredError, InvalidTokenError
 
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 15
@@ -39,15 +39,9 @@ def decode_access_token(token: str) -> str:
         )
         return payload["sub"]
     except jwt.ExpiredSignatureError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token expired",
-        )
+        raise TokenExpiredError("Access token has expired", detail="ACCESS_TOKEN_EXPIRED")
     except jwt.InvalidTokenError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token",
-        )
+        raise InvalidTokenError("Invalid access token", detail="INVALID_ACCESS_TOKEN")
 def create_refresh_token(user_id: str) -> str:
     payload = {
         "sub": user_id,
@@ -66,14 +60,11 @@ def decode_token(token: str, expected_type: str) -> str:
         )
 
         if payload.get("type") != expected_type:
-            raise HTTPException(status_code=401, detail="INVALID_TOKEN_TYPE")
+            raise InvalidTokenError(f"Expected {expected_type} token, got {payload.get('type')}", detail="INVALID_TOKEN_TYPE")
 
         return payload["sub"]
 
     except jwt.ExpiredSignatureError:
-        raise  # let caller decide
+        raise TokenExpiredError(f"{expected_type.capitalize()} token has expired", detail=f"{expected_type.upper()}_TOKEN_EXPIRED")
     except jwt.InvalidTokenError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="INVALID_TOKEN",
-        )
+        raise InvalidTokenError(f"Invalid {expected_type} token", detail=f"INVALID_{expected_type.upper()}_TOKEN")

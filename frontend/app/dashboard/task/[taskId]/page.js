@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect, use } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Editor from "@monaco-editor/react";
+import { taskService } from "../../../../services/task.service";
 
 // Autocomplete suggestions for each language
 const autocompleteSuggestions = {
@@ -241,22 +243,17 @@ const languageConfig = {
     name: "JavaScript",
     extension: "js",
     starterCode: `/**
- * Two Sum
+ * Solution
  * 
- * Given an array of integers nums and an integer target,
- * return indices of the two numbers such that they add up to target.
- * 
- * @param {number[]} nums - Array of integers
- * @param {number} target - Target sum
- * @return {number[]} - Indices of the two numbers
+ * Write your code here to solve the problem.
  */
-function twoSum(nums, target) {
+function solution(input) {
     // Write your solution here
     
 }
 
 // Test your solution
-console.log(twoSum([2, 7, 11, 15], 9)); // Expected: [0, 1]
+// console.log(solution(...));
 `,
   },
   python: {
@@ -264,24 +261,16 @@ console.log(twoSum([2, 7, 11, 15], 9)); // Expected: [0, 1]
     name: "Python",
     extension: "py",
     starterCode: `"""
-Two Sum
+Solution
 
-Given an array of integers nums and an integer target,
-return indices of the two numbers such that they add up to target.
-
-Args:
-    nums: List of integers
-    target: Target sum
-    
-Returns:
-    List of two indices
+Write your code here to solve the problem.
 """
-def two_sum(nums, target):
+def solution(input):
     # Write your solution here
     pass
 
 # Test your solution
-print(two_sum([2, 7, 11, 15], 9))  # Expected: [0, 1]
+# print(solution(...))
 `,
   },
   java: {
@@ -291,21 +280,13 @@ print(two_sum([2, 7, 11, 15], 9))  # Expected: [0, 1]
     starterCode: `import java.util.*;
 
 /**
- * Two Sum
+ * Solution
  * 
- * Given an array of integers nums and an integer target,
- * return indices of the two numbers such that they add up to target.
+ * Write your code here to solve the problem.
  */
 class Solution {
-    public int[] twoSum(int[] nums, int target) {
+    public void solve() {
         // Write your solution here
-        
-        return new int[]{};
-    }
-    
-    public static void main(String[] args) {
-        Solution sol = new Solution();
-        System.out.println(Arrays.toString(sol.twoSum(new int[]{2, 7, 11, 15}, 9))); // Expected: [0, 1]
     }
 }
 `,
@@ -316,31 +297,21 @@ class Solution {
     extension: "cpp",
     starterCode: `#include <iostream>
 #include <vector>
-#include <unordered_map>
+#include <string>
+#include <algorithm>
 using namespace std;
 
 /**
- * Two Sum
+ * Solution
  * 
- * Given an array of integers nums and an integer target,
- * return indices of the two numbers such that they add up to target.
+ * Write your code here to solve the problem.
  */
 class Solution {
 public:
-    vector<int> twoSum(vector<int>& nums, int target) {
+    void solve() {
         // Write your solution here
-        
-        return {};
     }
 };
-
-int main() {
-    Solution sol;
-    vector<int> nums = {2, 7, 11, 15};
-    vector<int> result = sol.twoSum(nums, 9);
-    cout << "[" << result[0] << ", " << result[1] << "]" << endl; // Expected: [0, 1]
-    return 0;
-}
 `,
   },
 };
@@ -394,9 +365,39 @@ const executeWithPiston = async (code, lang) => {
   return "Execution completed";
 };
 
-export default function TaskDetailPage({ params }) {
-  const [language, setLanguage] = useState("javascript");
-  const [code, setCode] = useState(languageConfig.javascript.starterCode);
+export default function TaskDetailPage({ params, searchParams }) {
+  const router = useRouter();
+  const unwrappedParams = use(params);
+  const unwrappedSearchParams = use(searchParams);
+  const taskId = unwrappedParams.taskId;
+  const hint = unwrappedSearchParams?.hint;
+  const querySlotId = unwrappedSearchParams?.slotId;
+
+  const [language, setLanguage] = useState("python");
+  const [code, setCode] = useState("");
+  const [problem, setProblem] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [showBackButton, setShowBackButton] = useState(false);
+
+  useEffect(() => {
+    async function loadTask() {
+      if (!taskId) return;
+      try {
+        setLoading(true);
+        const data = await taskService.getTaskExecutionDetails(taskId);
+        setProblem(data);
+        const lang = data.language?.toLowerCase() || "python";
+        setLanguage(lang);
+        setCode(data.current_code || data.starter_code || "");
+      } catch (error) {
+        console.error("Failed to load task:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadTask();
+  }, [taskId]);
+
   const [output, setOutput] = useState("");
   const [isRunning, setIsRunning] = useState(false);
   const [activeTab, setActiveTab] = useState("output"); // "output" or "testcases"
@@ -495,9 +496,13 @@ export default function TaskDetailPage({ params }) {
 
   // Reset code to starter template
   const handleResetCode = useCallback(() => {
-    setCode(languageConfig[language].starterCode);
+    if (problem && (!problem.language || problem.language.toLowerCase() === language)) {
+      setCode(problem.starter_code);
+    } else {
+      setCode(languageConfig[language]?.starterCode || "");
+    }
     setOutput("");
-  }, [language]);
+  }, [language, problem]);
 
   // Run code - executes JavaScript locally, others via Piston API
   const handleRunCode = useCallback(async () => {
@@ -538,105 +543,76 @@ export default function TaskDetailPage({ params }) {
     setIsRunning(false);
   }, [code, language]);
 
-  // Handle submit - actually tests the code against test cases
+  // Handle submit - calls backend submit endpoint
   const handleSubmit = useCallback(async () => {
     setIsRunning(true);
     setActiveTab("output");
     setOutput("Submitting solution...\n");
     
-    await new Promise(resolve => setTimeout(resolve, 500));
+    // Try to get slot ID from query params or task details
+    const slotId = querySlotId || problem?.slot_id;
     
-    if (language === "javascript") {
-      // Actually test JavaScript code against test cases
-      const testCases = [
-        { nums: [2, 7, 11, 15], target: 9, expected: [0, 1] },
-        { nums: [3, 2, 4], target: 6, expected: [1, 2] },
-        { nums: [3, 3], target: 6, expected: [0, 1] },
-      ];
+    if (!slotId) {
+      setOutput("Error: Slot ID missing. Cannot submit task.");
+      setIsRunning(false);
+      return;
+    }
+
+    try {
+      const result = await taskService.submitTask(slotId, taskId, {
+        answer: code,
+        language: language
+      });
       
-      let results = "Running test cases...\n\n";
-      let allPassed = true;
-      
-      try {
-        // Extract the twoSum function from user code
-        const wrappedCode = `
-          ${code}
-          return typeof twoSum === 'function' ? twoSum : null;
-        `;
-        const getUserFunc = new Function(wrappedCode);
-        const twoSum = getUserFunc();
-        
-        if (!twoSum) {
-          setOutput("Error: Could not find 'twoSum' function in your code.\nMake sure you define: function twoSum(nums, target) { ... }");
-          setIsRunning(false);
-          return;
-        }
-        
-        for (let i = 0; i < testCases.length; i++) {
-          const { nums, target, expected } = testCases[i];
-          const startTime = performance.now();
-          const userOutput = twoSum([...nums], target); // Clone array to avoid mutation
-          const endTime = performance.now();
-          const runtime = (endTime - startTime).toFixed(2);
-          
-          const passed = Array.isArray(userOutput) && 
-            userOutput.length === 2 &&
-            userOutput[0] === expected[0] && 
-            userOutput[1] === expected[1];
-          
-          if (!passed) allPassed = false;
-          
-          results += `Test Case ${i + 1}: nums = [${nums}], target = ${target}\n`;
-          results += `Expected: [${expected}]\n`;
-          results += `Your Output: ${Array.isArray(userOutput) ? `[${userOutput}]` : userOutput} ${passed ? "✓" : "✗"}\n`;
-          results += `Runtime: ${runtime}ms\n\n`;
-        }
-        
-        results += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
-        if (allPassed) {
-          results += "All test cases passed! 🎉\n";
-          results += "+50 XP earned!";
-        } else {
-          results += "Some test cases failed. Try again! 💪";
-        }
-        
-      } catch (error) {
-        results += `\nError executing code: ${error.message}`;
-        allPassed = false;
+      // FIX: Access the nested evaluation object
+      const evaluation = result.evaluation;
+
+      if (!evaluation) {
+         setOutput("Submission received, but no evaluation data was returned.");
+         setIsRunning(false);
+         return;
       }
       
-      setOutput(results);
-    } else {
-      // For Python, Java, C++ - run the code via Piston API
-      try {
-        setOutput("Running code via Piston API...\n\n");
-        const result = await executeWithPiston(code, language);
+      let outputMsg = "";
+      
+      // FIX: Check evaluation.passed instead of result.passed
+      if (evaluation.passed) {
+        outputMsg = "All test cases passed! 🎉\n\nEvaluation Summary: " + (evaluation.evaluation_summary || "");
         
-        // Check if output contains expected results
-        const hasTest1 = result.includes("[0, 1]") || result.includes("[0,1]");
-        const hasTest2 = result.includes("[1, 2]") || result.includes("[1,2]");
-        const hasTest3 = result.includes("[0, 1]") || result.includes("[0,1]");
-        
-        let finalOutput = result + "\n\n";
-        finalOutput += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
-        
-        if (hasTest1 && hasTest2) {
-          finalOutput += "All test cases passed! 🎉\n";
-          finalOutput += "+50 XP earned!";
-        } else if (result.includes("Error")) {
-          finalOutput += "Code has errors. Please fix and try again! 🔧";
-        } else {
-          finalOutput += "Code executed. Check output above.";
+        // Success celebration for mastery of invariants
+        if (evaluation.mastered_invariants?.length > 0) {
+           outputMsg += "\n\n🏆 Skills Mastered:\n- " + evaluation.mastered_invariants.join("\n- ");
         }
+
+        setTimeout(() => {
+           setShowBackButton(true);
+        }, 1500);
+      } else {
+        outputMsg = "Some test cases failed. Try again! 💪\n\n";
         
-        setOutput(finalOutput);
-      } catch (error) {
-        setOutput(`Error: ${error.message}`);
+        // OPTIONAL: Display mistakes if available
+        if (evaluation.mistakes && evaluation.mistakes.length > 0) {
+           outputMsg += "Mistakes Identified:\n- " + evaluation.mistakes.join("\n- ") + "\n\n";
+        }
       }
+
+      // FIX: Display feedback from evaluation.feedback
+      if (evaluation.feedback) {
+        outputMsg += "\nAI Feedback:\n" + evaluation.feedback;
+      }
+
+      // FIX: Display detailed explanation if it exists (usually for Coding tasks)
+      if (evaluation.explanation) {
+        outputMsg += "\n\nCode Analysis & Improvements:\n" + evaluation.explanation;
+      }
+
+      setOutput(outputMsg);
+    } catch (error) {
+      setOutput(`Submission Error: ${error.message || "Unknown error"}`);
     }
     
     setIsRunning(false);
-  }, [code, language]);
+  }, [code, language, taskId, querySlotId, problem]);
 
   return (
     <div className="w-[95%] xl:w-[92%] 2xl:w-[90%] mx-auto px-2 sm:px-4 lg:px-6 py-6 sm:py-8 lg:py-10">
@@ -684,46 +660,62 @@ export default function TaskDetailPage({ params }) {
                   </svg>
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold">Two Sum</h1>
+                  <h1 className="text-xl font-bold">{problem?.title}</h1>
                   <div className="flex items-center gap-2 mt-0.5">
-                    <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-[10px] font-semibold text-emerald-400 uppercase">Easy</span>
-                    <span className="text-xs text-slate-500">Arrays & Hash Maps</span>
+                    {problem?.difficulty && (
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-[10px] font-semibold text-emerald-400 uppercase">{problem.difficulty}</span>
+                    )}
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20">
-                <svg className="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
-                </svg>
-                <span className="text-xs font-bold text-amber-400">+50 XP</span>
-              </div>
+              {problem?.xp !== undefined && (
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                  <svg className="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+                  </svg>
+                  <span className="text-xs font-bold text-amber-400">+{problem.xp} XP</span>
+                </div>
+              )}
             </div>
 
             <div className="prose prose-invert prose-sm max-w-none">
               <h3 className="text-base font-semibold text-white mb-3">Problem Description</h3>
-              <p className="text-slate-300 leading-relaxed mb-4">
-                Given an array of integers <code className="px-1.5 py-0.5 rounded bg-violet-500/20 text-violet-300 text-xs font-mono">nums</code> and an integer <code className="px-1.5 py-0.5 rounded bg-violet-500/20 text-violet-300 text-xs font-mono">target</code>, return indices of the two numbers such that they add up to target.
-              </p>
-              <p className="text-slate-300 leading-relaxed mb-4">
-                You may assume that each input would have exactly one solution, and you may not use the same element twice.
-              </p>
-
-              <h3 className="text-base font-semibold text-white mb-3 mt-6">Example</h3>
-              <div className="bg-black/30 rounded-xl p-4 mb-4">
-                <p className="text-slate-400 text-xs mb-2">Input:</p>
-                <code className="text-sm text-slate-300 font-mono">nums = [2, 7, 11, 15], target = 9</code>
-                <p className="text-slate-400 text-xs mb-2 mt-3">Output:</p>
-                <code className="text-sm text-emerald-400 font-mono">[0, 1]</code>
-                <p className="text-slate-400 text-xs mt-3">Because nums[0] + nums[1] == 9, we return [0, 1]</p>
+              <div className="text-slate-300 leading-relaxed mb-4 whitespace-pre-wrap">
+                {problem?.description}
               </div>
 
-              <h3 className="text-base font-semibold text-white mb-3 mt-6">Constraints</h3>
-              <ul className="text-slate-300 text-sm space-y-1 list-disc list-inside">
-                <li>2 ≤ nums.length ≤ 10⁴</li>
-                <li>-10⁹ ≤ nums[i] ≤ 10⁹</li>
-                <li>-10⁹ ≤ target ≤ 10⁹</li>
-                <li>Only one valid answer exists</li>
-              </ul>
+              {problem?.invariants_required?.length > 0 && (
+                <div className="mt-6 p-4 rounded-xl bg-violet-500/5 border border-violet-500/20">
+                  <h4 className="text-xs font-bold text-violet-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Mastery Goals
+                  </h4>
+                  <ul className="space-y-1.5">
+                    {problem.invariants_required.map((invariant, idx) => (
+                      <li key={idx} className="text-xs text-slate-300 flex items-start gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-violet-500 mt-1.5 shrink-0" />
+                        {invariant}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {(hint || problem?.hint) && (
+                <details className="mt-6 border border-amber-500/20 bg-amber-500/5 rounded-lg overflow-hidden group">
+                  <summary className="flex items-center gap-2 p-3 cursor-pointer select-none text-amber-400 hover:text-amber-300 transition-colors">
+                    <svg className="w-5 h-5 group-open:rotate-90 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                    <span className="font-medium text-sm">Need a hint?</span>
+                  </summary>
+                  <div className="px-4 pb-4 pt-1 text-slate-300 text-sm leading-relaxed border-t border-amber-500/10">
+                    {hint || problem?.hint}
+                  </div>
+                </details>
+              )}
             </div>
           </div>
         </div>
@@ -749,10 +741,10 @@ export default function TaskDetailPage({ params }) {
                 onChange={(e) => handleLanguageChange(e.target.value)}
                 className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-slate-300 outline-none focus:border-violet-500/50 cursor-pointer"
               >
-                <option value="javascript">JavaScript</option>
+                {/* <option value="javascript">JavaScript</option> */}
                 <option value="python">Python</option>
-                <option value="java">Java</option>
-                <option value="cpp">C++</option>
+                {/* <option value="java">Java</option>
+                <option value="cpp">C++</option> */}
               </select>
             </div>
             <p className="text-xs text-slate-500 mt-2 italic">
@@ -858,33 +850,20 @@ export default function TaskDetailPage({ params }) {
                 </div>
               ) : (
                 <div className="p-4 space-y-3">
-                  <div className="p-3 rounded-lg bg-white/3 border border-white/6">
-                    <p className="text-xs text-slate-400 mb-1">Test Case 1</p>
-                    <p className="text-sm text-slate-300 font-mono">
-                      Input: nums = [2,7,11,15], target = 9
-                    </p>
-                    <p className="text-sm text-emerald-400 font-mono">
-                      Expected: [0,1]
-                    </p>
-                  </div>
-                  <div className="p-3 rounded-lg bg-white/3 border border-white/6">
-                    <p className="text-xs text-slate-400 mb-1">Test Case 2</p>
-                    <p className="text-sm text-slate-300 font-mono">
-                      Input: nums = [3,2,4], target = 6
-                    </p>
-                    <p className="text-sm text-emerald-400 font-mono">
-                      Expected: [1,2]
-                    </p>
-                  </div>
-                  <div className="p-3 rounded-lg bg-white/3 border border-white/6">
-                    <p className="text-xs text-slate-400 mb-1">Test Case 3</p>
-                    <p className="text-sm text-slate-300 font-mono">
-                      Input: nums = [3,3], target = 6
-                    </p>
-                    <p className="text-sm text-emerald-400 font-mono">
-                      Expected: [0,1]
-                    </p>
-                  </div>
+                    {problem?.test_cases?.map((testCase, idx) => (
+                    <div key={idx} className="p-3 rounded-lg bg-white/3 border border-white/6">
+                        <p className="text-xs text-slate-400 mb-1">Test Case {idx + 1}</p>
+                        <p className="text-sm text-slate-300 font-mono">
+                        Input: {typeof testCase.input === 'object' ? JSON.stringify(testCase.input) : testCase.input}
+                        </p>
+                        <p className="text-sm text-emerald-400 font-mono">
+                        Expected: {typeof testCase.expected === 'object' ? JSON.stringify(testCase.expected) : testCase.expected}
+                        </p>
+                    </div>
+                    ))}
+                    {!problem?.test_cases?.length && (
+                        <p className="text-slate-500">No test cases available.</p>
+                    )}
                 </div>
               )}
             </div>
@@ -904,16 +883,28 @@ export default function TaskDetailPage({ params }) {
                 </svg>
                 Run Code
               </button>
-              <button 
-                onClick={handleSubmit}
-                disabled={isRunning}
-                className="px-4 py-2 rounded-lg bg-linear-to-r from-violet-500 to-purple-600 text-sm font-medium text-white hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Submit
-              </button>
+              {showBackButton ? (
+                <button 
+                    onClick={() => router.push('/dashboard')}
+                    className="px-4 py-2 rounded-lg bg-emerald-600 text-sm font-medium text-white hover:bg-emerald-500 transition-all flex items-center gap-2"
+                >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    Back to Dashboard
+                </button>
+              ) : (
+                <button 
+                    onClick={handleSubmit}
+                    disabled={isRunning}
+                    className="px-4 py-2 rounded-lg bg-linear-to-r from-violet-500 to-purple-600 text-sm font-medium text-white hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Submit
+                </button>
+              )}
             </div>
             <button 
               onClick={handleResetCode}

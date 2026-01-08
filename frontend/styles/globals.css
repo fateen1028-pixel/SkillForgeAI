@@ -470,6 +470,7 @@ body {
 /* Prevent text selection on buttons */
 button {
   user-select: none;
+  cursor: pointer;
 }
 
 /* Smooth transitions for interactive elements */

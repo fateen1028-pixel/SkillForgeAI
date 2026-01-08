@@ -1,8 +1,9 @@
 from pydantic import BaseModel
-from typing import List, Literal, Optional
+from typing import List, Literal, Optional, Set
 from datetime import datetime
 
 from app.schemas.task_instance import TaskInstance
+from app.domain.evaluation_history import EvaluationSnapshot
 
 
 class TaskSlot(BaseModel):
@@ -20,11 +21,21 @@ class TaskSlot(BaseModel):
     active_task_instance_id: Optional[str] = None
     locked_reason: Optional[Literal["dependency_failed", "remediation_required"]] = None
     remediation_attempts: int = 0
+    
+    # 🔑 NEW: Track position in the remediation strategy list
+    current_remediation_step: int = 0
+    
+    # V2.3: Truthful UX
+    user_message: Optional[str] = None
+
+    # V2.4: Evaluation Consistency
+    evaluation_history: List[EvaluationSnapshot] = []
+    flags: Set[str] = set()
 
 
 
 class PhaseState(BaseModel):
-    phase_id: int
+    phase_id: str
     name: str
     phase_status: Literal["locked", "active", "completed"]
     slots: List[TaskSlot]
@@ -40,7 +51,7 @@ class RoadmapState(BaseModel):
     status: Literal["active", "completed", "locked"]
     is_active: bool
 
-    current_phase: int
+    current_phase: str
     phases: List[PhaseState]
 
     # 🔑 CRITICAL

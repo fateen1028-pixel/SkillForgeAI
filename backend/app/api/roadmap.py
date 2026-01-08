@@ -1,7 +1,8 @@
 # app/api/roadmap.py
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from app.api.deps import get_current_user, get_user_roadmap_repo
+from app.api.deps import get_current_user, get_user_roadmap_repo, get_db
+from app.db.learning_state_repo import get_user_learning_state
 from app.schemas.roadmap_state import RoadmapState
 from app.db.user_roadmap_repo import UserRoadmapRepo
 from app.services.roadmap_service import generate_v1_roadmap
@@ -14,8 +15,8 @@ router = APIRouter(
 )
 
 
-@router.get("", response_model=RoadmapState)
-@router.get("/current", response_model=RoadmapState)
+@router.get("", response_model=RoadmapState, response_model_exclude={"phases": {"__all__": {"slots": {"__all__": {"remediation_attempts", "current_remediation_step"}}}}})
+@router.get("/current", response_model=RoadmapState, response_model_exclude={"phases": {"__all__": {"slots": {"__all__": {"remediation_attempts", "current_remediation_step"}}}}})
 async def get_roadmap(
     current_user=Depends(get_current_user),
     repo: UserRoadmapRepo = Depends(get_user_roadmap_repo)
@@ -41,18 +42,27 @@ async def get_roadmap(
     return roadmap
 
 
-@router.post("/init", response_model=RoadmapState)
+@router.post("/init", response_model=RoadmapState, response_model_exclude={"phases": {"__all__": {"slots": {"__all__": {"remediation_attempts", "current_remediation_step"}}}}})
 async def init_roadmap(
     user: dict = Depends(get_current_user),
-    repo: UserRoadmapRepo = Depends(get_user_roadmap_repo)
+    repo: UserRoadmapRepo = Depends(get_user_roadmap_repo),
+    db = Depends(get_db)
 ):
     existing = await repo.get_user_roadmap(user_id=user["_id"])
     if existing:
         raise HTTPException(400, "Roadmap already exists")
 
+    goal = "placement"
+    try:
+        ls = await get_user_learning_state(db, str(user["_id"]))
+        if ls and ls.goals:
+            goal = ls.goals[0]
+    except HTTPException:
+        pass
+
     roadmap = generate_v1_roadmap(
         user_id=str(user["_id"]),
-        goal=user.get("goal", "placement")
+        goal=goal
     )
 
     try:

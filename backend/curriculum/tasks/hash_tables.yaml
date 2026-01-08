@@ -1,0 +1,80 @@
+skill: hash_tables
+version: v1
+description: >
+  Hash table curriculum focused on key-space mapping, constant-time expectation,
+  collision management, and invariants of distribution.
+
+slots:
+
+# =========================================================
+# SLOT 1 — KEY TO INDEX MAPPING
+# =========================================================
+
+  - slot_id: HASH_SLOT_1_MAPPING
+    mental_install: "Hashing maps arbitrary keys to bounded index space."
+    invariant: "Same key → same index; different keys may collide."
+    mastery_signals:
+      - Explains hash function role
+      - Predicts collisions
+    hard_failures:
+      - Thinks hashing guarantees uniqueness
+      - Confuses with sorting
+
+    templates:
+      - id: hash_s1_explain
+        type: explanation
+        difficulty: easy
+        prompt: |
+          What is hashing and why are collisions unavoidable?
+        rubric: "Must reference pigeonhole principle and mapping."
+        concepts: [hashing, mapping]
+
+# =========================================================
+# SLOT 2 — COLLISION MANAGEMENT
+# =========================================================
+
+  - slot_id: HASH_SLOT_2_COLLISIONS
+    mental_install: "Collisions require structured resolution strategies."
+    invariant: "No data loss under collision."
+    mastery_signals:
+      - Implements chaining
+      - Explains probing
+    hard_failures:
+      - Overwrites entries
+      - Assumes no collision
+
+    templates:
+      - id: hash_s2_two_sum
+        type: coding
+        difficulty: medium
+        prompt: "Solve Two Sum using a hash map."
+        language: python
+        starter_code: |
+          def solve(nums, target):
+              pass
+        concepts: [hashing, constant_lookup]
+
+# =========================================================
+# SLOT 3 — FREQUENCY & INDEXING POWER
+# =========================================================
+
+  - slot_id: HASH_SLOT_3_FREQUENCY
+    mental_install: "Hash tables compress large domains into direct access structures."
+    invariant: "Counts and presence checks are O(1) expected."
+    mastery_signals:
+      - Builds frequency maps
+      - Uses set/map correctly
+    hard_failures:
+      - Uses nested loops
+      - Breaks uniqueness constraints
+
+    templates:
+      - id: hash_s3_frequency
+        type: coding
+        difficulty: medium
+        prompt: "Return the first non-repeating character."
+        language: python
+        starter_code: |
+          def solve(s):
+              pass
+        concepts: [frequency_map, indexing]

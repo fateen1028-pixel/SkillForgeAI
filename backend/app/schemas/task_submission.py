@@ -20,3 +20,7 @@ class TaskSubmission(BaseModel):
     created_at: datetime
     evaluation: AIEvaluationResult | None = None
     evaluated_at: Optional[datetime] = None
+    
+    # V2.2 Integrity Fields
+    hint_used: bool = False
+    time_spent_seconds: Optional[int] = None

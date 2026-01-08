@@ -58,7 +58,7 @@ export default function DashboardLayout({ children }) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileRef = useRef(null);
   const [userProfile, setUserProfile] = useState(null);
-  const { logout } = useAuth();
+  const { logout, isAuthenticated, loading } = useAuth();
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -73,6 +73,8 @@ export default function DashboardLayout({ children }) {
 
   // Fetch user profile on mount
   useEffect(() => {
+    if (loading || !isAuthenticated) return;
+
     async function getProfile() {
       // Use the same fetchGeneralProfile helper as dashboard
       const APP_URL = process.env.NEXT_PUBLIC_APP_URL;
@@ -92,7 +94,7 @@ export default function DashboardLayout({ children }) {
       setUserProfile(profile);
     }
     getProfile();
-  }, []);
+  }, [loading, isAuthenticated]);
 
   // Check if current path matches nav item
   const isActive = (href) => {
@@ -306,13 +308,13 @@ export default function DashboardLayout({ children }) {
               <Link href="/" className="text-xs text-slate-400 hover:text-white transition-colors">
                 Back to Home
               </Link>
-              <span className="text-slate-700">•</span>
+              {/* <span className="text-slate-700">•</span>
               <Link href="/dashboard/chatbot" className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-linear-to-r from-violet-500/20 to-purple-500/20 border border-violet-500/30 text-sm font-medium text-white hover:from-violet-500/30 hover:to-purple-500/30 transition-all">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                 </svg>
                 Ask AI
-              </Link>
+              </Link> */}
             </div>
           </div>
         </div>

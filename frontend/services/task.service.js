@@ -1,6 +1,20 @@
 import api from './api';
 
 export const taskService = {
+  getTaskExecutionDetails: async (instanceId) => {
+    const response = await api.get(`/tasks/${instanceId}`);
+    return response.data;
+  },
+
+  submitTask: async (slotId, instanceId, data) => {
+    const response = await api.post(`/submissions`, {
+      slot_id: slotId,
+      task_instance_id: instanceId,
+      payload: data
+    });
+    return response.data;
+  },
+
   getTasks: async () => {
     // const response = await api.get('/tasks');
     // return response.data;

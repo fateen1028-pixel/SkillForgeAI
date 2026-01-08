@@ -1,0 +1,188 @@
+skill: strings
+version: v1
+description: >
+  Strings curriculum focused on immutability, encoding, memory layout,
+  pattern traversal, and algorithmic text reasoning. Emphasizes difference
+  between character arrays and true string abstractions.
+
+slots:
+
+# =========================================================
+# SLOT 1 — STRING MEMORY & IMMUTABILITY
+# =========================================================
+
+  - slot_id: STRING_SLOT_1_MEMORY_MODEL
+    mental_install: "Strings are contiguous sequences of characters, often immutable, stored with encoding."
+    invariant: "Characters occupy sequential memory; modification creates new strings."
+    mastery_signals:
+      - Explains immutability
+      - Distinguishes char vs string
+      - Describes encoding conceptually
+    hard_failures:
+      - Thinks strings mutate in place
+      - Confuses string with list
+      - Cannot explain copy-on-modify
+
+    templates:
+      - id: strings_s1_memory_explain
+        type: explanation
+        difficulty: easy
+        prompt: |
+          Explain how strings are stored in memory and why many languages make them immutable.
+        rubric: "Must mention contiguous layout and immutability consequence."
+        concepts: [memory_model, immutability]
+
+      - id: strings_s1_access
+        type: coding
+        difficulty: easy
+        prompt: "Return the character at index i."
+        language: python
+        starter_code: |
+          def solve(s, i):
+              pass
+        concepts: [indexing, strings]
+
+# =========================================================
+# SLOT 2 — ITERATION & FREQUENCY STATE
+# =========================================================
+
+  - slot_id: STRING_SLOT_2_TRAVERSAL
+    mental_install: "Strings are traversed like arrays but produce symbolic state."
+    invariant: "Every character contributes to evolving state."
+    mastery_signals:
+      - Correct traversal
+      - Builds frequency maps
+      - Handles empty strings
+    hard_failures:
+      - Skips characters
+      - Corrupts counters
+      - Fails edge cases
+
+    templates:
+      - id: strings_s2_count_vowels
+        type: coding
+        difficulty: easy
+        prompt: "Count vowels in a string."
+        language: python
+        starter_code: |
+          def solve(s):
+              pass
+        concepts: [iteration, state]
+
+      - id: strings_s2_frequency
+        type: coding
+        difficulty: easy
+        prompt: "Return a frequency dictionary of characters."
+        language: python
+        starter_code: |
+          def solve(s):
+              pass
+        concepts: [frequency, traversal]
+
+# =========================================================
+# SLOT 3 — SUBSTRING & WINDOW THINKING
+# =========================================================
+
+  - slot_id: STRING_SLOT_3_SUBSTRINGS
+    mental_install: "Substrings are contiguous character ranges defined by boundaries."
+    invariant: "A substring is fully defined by (start, end)."
+    mastery_signals:
+      - Correct slicing logic
+      - Implements sliding window
+      - Explains O(n²) vs O(n)
+    hard_failures:
+      - Confuses subsequence
+      - Breaks windows
+      - Uses brute force blindly
+
+    templates:
+      - id: strings_s3_longest_unique
+        type: coding
+        difficulty: medium
+        prompt: "Find length of longest substring without repeating characters."
+        language: python
+        starter_code: |
+          def solve(s):
+              pass
+        concepts: [sliding_window, substring]
+
+# =========================================================
+# SLOT 4 — STRING TRANSFORMATION COST
+# =========================================================
+
+  - slot_id: STRING_SLOT_4_COST_MODEL
+    mental_install: "String modification often implies full copy."
+    invariant: "Any structural change costs O(n)."
+    mastery_signals:
+      - Predicts inefficiency
+      - Uses builders/lists when needed
+      - Avoids repeated concatenation
+    hard_failures:
+      - Builds strings in loops
+      - Cannot explain inefficiency
+      - Ignores cost models
+
+    templates:
+      - id: strings_s4_reverse
+        type: coding
+        difficulty: medium
+        prompt: "Reverse a string efficiently."
+        language: python
+        starter_code: |
+          def solve(s):
+              pass
+        concepts: [immutability, builders]
+
+# =========================================================
+# SLOT 5 — PATTERN MATCHING MENTAL MODEL
+# =========================================================
+
+  - slot_id: STRING_SLOT_5_PATTERN_MATCHING
+    mental_install: "Pattern matching is alignment and state progression."
+    invariant: "Partial matches preserve state across shifts."
+    mastery_signals:
+      - Implements naive search
+      - Explains prefix reuse
+      - Traces failures
+    hard_failures:
+      - Blind brute force
+      - Cannot explain mismatch recovery
+      - Treats as magic
+
+    templates:
+      - id: strings_s5_naive_match
+        type: coding
+        difficulty: medium
+        prompt: "Return first index of pattern in text or -1."
+        language: python
+        starter_code: |
+          def solve(text, pattern):
+              pass
+        concepts: [pattern_matching]
+
+# =========================================================
+# SLOT 6 — ENCODING & COMPARISON
+# =========================================================
+
+  - slot_id: STRING_SLOT_6_ENCODING
+    mental_install: "Characters are numeric encodings; comparisons are ordinal."
+    invariant: "Lexicographic order depends on encoding."
+    mastery_signals:
+      - Explains ASCII/Unicode conceptually
+      - Implements comparisons
+      - Avoids magic
+    hard_failures:
+      - Treats chars as abstract
+      - Cannot explain ordering
+      - Breaks case logic
+
+    templates:
+      - id: strings_s6_compare
+        type: coding
+        difficulty: easy
+        prompt: "Implement case-insensitive comparison."
+        language: python
+        starter_code: |
+          def solve(a, b):
+              pass
+        concepts: [encoding, normalization]

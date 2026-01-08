@@ -1,0 +1,115 @@
+skill: linked_lists
+version: v1
+description: >
+  Linked list curriculum focused on indirection, pointer traversal,
+  structural mutation, and loss of random access.
+
+slots:
+
+# =========================================================
+# SLOT 1 — NODE & POINTER MODEL
+# =========================================================
+
+  - slot_id: LINKED_LIST_SLOT_1_NODE_MODEL
+    mental_install: "Data is stored in nodes; order is maintained by pointers."
+    invariant: "Traversal required to reach any position."
+    mastery_signals:
+      - Explains node structure
+      - Draws memory diagrams
+      - Accepts non-contiguity
+    hard_failures:
+      - Thinks index access exists
+      - Confuses with arrays
+      - Breaks pointer logic
+
+    templates:
+      - id: ll_s1_node_define
+        type: coding
+        difficulty: easy
+        prompt: "Define a Node class and create a 3-node list."
+        language: python
+        starter_code: |
+          class Node:
+              pass
+        concepts: [nodes, pointers]
+
+# =========================================================
+# SLOT 2 — TRAVERSAL & SEARCH
+# =========================================================
+
+  - slot_id: LINKED_LIST_SLOT_2_TRAVERSAL
+    mental_install: "Traversal is the only access mechanism."
+    invariant: "Next pointer defines reachability."
+    mastery_signals:
+      - Iterates safely
+      - Detects null
+      - Counts nodes
+    hard_failures:
+      - Infinite loops
+      - Skips nodes
+      - Breaks head
+
+    templates:
+      - id: ll_s2_search
+        type: coding
+        difficulty: easy
+        prompt: "Search for value x in a linked list."
+        language: python
+        starter_code: |
+          def solve(head, x):
+              pass
+        concepts: [traversal]
+
+# =========================================================
+# SLOT 3 — INSERTION & DELETION
+# =========================================================
+
+  - slot_id: LINKED_LIST_SLOT_3_INSERT_DELETE
+    mental_install: "Rewiring pointers mutates structure."
+    invariant: "No memory shifting; only reference updates."
+    mastery_signals:
+      - Correct pointer rewiring
+      - Preserves list
+      - Handles head deletion
+    hard_failures:
+      - Loses nodes
+      - Creates cycles accidentally
+      - Forgets next
+
+    templates:
+      - id: ll_s3_insert
+        type: coding
+        difficulty: medium
+        prompt: "Insert node at position k."
+        language: python
+        starter_code: |
+          def solve(head, k, x):
+              pass
+        concepts: [mutation]
+
+# =========================================================
+# SLOT 4 — STRUCTURAL PATHOLOGIES
+# =========================================================
+
+  - slot_id: LINKED_LIST_SLOT_4_CYCLE_DETECTION
+    mental_install: "Pointers can create hidden structure."
+    invariant: "Traversal may not terminate."
+    mastery_signals:
+      - Implements Floyd's algorithm
+      - Explains fast/slow logic
+      - Identifies cycles
+    hard_failures:
+      - Relies on visited sets only
+      - Cannot explain invariant
+      - Infinite loops
+
+    templates:
+      - id: ll_s4_cycle
+        type: coding
+        difficulty: hard
+        prompt: "Detect if a linked list has a cycle."
+        language: python
+        starter_code: |
+          def solve(head):
+              pass
+        concepts: [two_pointers, invariants]

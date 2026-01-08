@@ -1,0 +1,62 @@
+skill: queues
+version: v1
+description: >
+  Queue curriculum focused on FIFO discipline, head-tail separation,
+  buffering, and flow control.
+
+slots:
+
+# =========================================================
+# SLOT 1 — FIFO DISCIPLINE
+# =========================================================
+
+  - slot_id: QUEUE_SLOT_1_FIFO
+    mental_install: "Queues enforce First-In-First-Out access with separate head and tail."
+    invariant: "Removal always happens from front; insertion always at rear."
+    mastery_signals:
+      - Explains FIFO
+      - Implements enqueue/dequeue safely
+    hard_failures:
+      - Uses stack logic
+      - Removes from rear
+
+    templates:
+      - id: queue_s1_impl
+        type: coding
+        difficulty: easy
+        prompt: "Implement a queue using a circular array."
+        language: python
+        starter_code: |
+          class Queue:
+              def __init__(self, k):
+                  pass
+              def enqueue(self, x):
+                  pass
+              def dequeue(self):
+                  pass
+        concepts: [fifo, circular_buffer]
+
+# =========================================================
+# SLOT 2 — BUFFER & FLOW CONTROL
+# =========================================================
+
+  - slot_id: QUEUE_SLOT_2_BUFFERING
+    mental_install: "Queues decouple producers from consumers."
+    invariant: "Order preserved; operations symmetric."
+    mastery_signals:
+      - Models pipelines
+      - Explains buffering purpose
+    hard_failures:
+      - Treats queue as array
+      - Misuses order
+
+    templates:
+      - id: queue_s2_sliding_window
+        type: coding
+        difficulty: medium
+        prompt: "Find maximum in each sliding window."
+        language: python
+        starter_code: |
+          def solve(arr, k):
+              pass
+        concepts: [deque, window_model]

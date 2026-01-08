@@ -66,7 +66,7 @@ export default function RegisterPage() {
   };
 
   // Show loading while checking auth
-  if (isAuthenticated === null) {
+  if (authLoading) {
     return (
       <div className="min-h-screen bg-[#030712] flex items-center justify-center">
         <div className="animate-spin w-8 h-8 border-2 border-violet-500 border-t-transparent rounded-full" />

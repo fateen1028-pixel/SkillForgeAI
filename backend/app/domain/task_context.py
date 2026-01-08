@@ -6,4 +6,5 @@ from typing import Literal
 class TaskContext(BaseModel):
     task_instance_id: str
     skill: str
-    difficulty: Literal["easy", "medium", "hard"]
+    difficulty: str # Relaxed from Literal to allow flexibility, or should be Literal["easy", "medium", "hard"]
+    question_type: str

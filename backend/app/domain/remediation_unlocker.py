@@ -1,7 +1,10 @@
 # app/domain/remediation_unlocker.py
 
 from app.schemas.roadmap_state import RoadmapState
+from app.core.system_status import system_status
+import logging
 
+logger = logging.getLogger(__name__)
 
 def unlock_dependent_slots_after_remediation(
     *,
@@ -12,6 +15,11 @@ def unlock_dependent_slots_after_remediation(
     Unlock slots that were locked due to dependency failure
     AFTER a successful remediation.
     """
+    
+    # V2.5: Emergency Safe Mode
+    if system_status.is_frozen:
+        logger.warning("System is in SAFE MODE. Unlocks are frozen.")
+        return
 
     found = False
 

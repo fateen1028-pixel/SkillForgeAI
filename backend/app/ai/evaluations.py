@@ -28,6 +28,7 @@ def evaluate_task(
         task_instance_id=task_instance.task_instance_id,
         skill=task_template.skill,
         difficulty=task_instance.difficulty,
+        question_type=task_template.question_type,
     )
 
     if task_template.question_type == "mcq":
@@ -36,22 +37,48 @@ def evaluate_task(
                 f"MCQ task {task_template.task_template_id} missing correct_option"
             )
 
+        # Support both 'selected_option' and generic 'answer'
+        selected_option = submission_payload.get("selected_option")
+        if selected_option is None:
+            selected_option = submission_payload.get("answer")
+
+        if selected_option is None:
+             raise ValueError("Missing 'selected_option' or 'answer' in payload")
+
         return evaluate_mcq(
-            selected_option=submission_payload["selected_option"],
+            selected_option=selected_option,
             correct_option=task_template.correct_option,
             skill=task_template.skill,
         )
 
     if task_template.question_type == "coding":
+        # Support both 'code' and generic 'answer'
+        code = submission_payload.get("code")
+        if code is None:
+            code = submission_payload.get("answer")
+            
+        language = submission_payload.get("language", "python")
+
+        if code is None:
+             raise ValueError("Missing 'code' or 'answer' in payload")
+
         return evaluate_coding(
-            code=submission_payload["code"],
-            language=submission_payload["language"],
+            code=code,
+            language=language,
             context=context,
         )
 
     if task_template.question_type == "explanation":
+        # Support both 'text' and generic 'answer'
+        text = submission_payload.get("text")
+        if text is None:
+            text = submission_payload.get("answer")
+
+        if text is None:
+             raise ValueError("Missing 'text' or 'answer' in payload")
+
         return evaluate_explanation(
-            text=submission_payload["text"],
+            text=text,
             context=context,
         )
 

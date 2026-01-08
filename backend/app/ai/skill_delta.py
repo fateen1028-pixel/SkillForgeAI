@@ -40,7 +40,14 @@ def compute_skill_deltas(
 
     # 1. Fail → penalty
     if not evaluation.passed:
-        return {skill: FAIL_PENALTY}
+        penalty = FAIL_PENALTY
+        
+        # V3: Continuous partial credit attenuation
+        # Uses normalized partial_credit (0.0-1.0) from evaluation service
+        if getattr(evaluation, 'partial_credit', 0.0) > 0:
+             penalty *= (1.0 - evaluation.partial_credit)
+             
+        return {skill: penalty}
 
     # 2. Weak pass → no gain
     if evaluation.score < MIN_PASS_SCORE:
@@ -48,8 +55,13 @@ def compute_skill_deltas(
 
     # 3. Base delta from difficulty
     base = BASE_DELTA.get(difficulty)
+    
     if base is None:
         raise ValueError(f"Unknown difficulty: {difficulty}")
+
+    # V2.2: Weight by confidence
+    if hasattr(evaluation, 'confidence'):
+        base *= evaluation.confidence
 
     delta = base
 

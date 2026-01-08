@@ -3,9 +3,11 @@ from app.domain.task_context import TaskContext
 # from app.ai.gemini_client import get_gemini_llm
 from app.ai.groq_client import get_groq_llm
 from app.ai.utils import normalize_llm_content
+from app.core.config import settings
 from langchain_core.messages import HumanMessage
 import json
 
+PROMPT_VERSION = "2.5.0"
 
 def evaluate_explanation(
     *,
@@ -18,6 +20,7 @@ def evaluate_explanation(
 
     # llm = get_gemini_llm()
     llm = get_groq_llm()
+    model_name = settings.GROQ_MODEL
 
     prompt = f"""
 Evaluate the explanation below.
@@ -48,7 +51,17 @@ User explanation:
 
     try:
         data = json.loads(raw)
-        return AIEvaluationResult(**data)
+        return AIEvaluationResult(
+            passed=data["passed"],
+            score=data["score"],
+            feedback=data["feedback"],
+            detected_concepts=data.get("detected_concepts", []),
+            mistakes=data.get("mistakes", []),
+            model_name=model_name,
+            model_version="1.0.0",
+            prompt_version=PROMPT_VERSION,
+            temperature=0.0
+        )
     except Exception as e:
         raise RuntimeError(
             f"Invalid JSON from explanation evaluator.\nRaw:\n{raw}"

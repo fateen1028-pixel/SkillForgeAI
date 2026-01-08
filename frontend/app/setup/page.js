@@ -3,15 +3,20 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useAuth } from "@/hooks/useAuth";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL;
 
-const GOALS = [
-  { id: "placement", label: "Campus Placements", icon: "🎯", desc: "Prepare for college placements" },
-  { id: "switch", label: "Job Switch", icon: "🔄", desc: "Switch to a better role" },
-  { id: "upskill", label: "Upskilling", icon: "📈", desc: "Level up current skills" },
-  { id: "internship", label: "Internship", icon: "💼", desc: "Land an internship" },
-];
+if (!APP_URL) {
+  console.error("NEXT_PUBLIC_APP_URL is not defined");
+}
+
+// const GOALS = [
+//   { id: "placement", label: "Campus Placements", icon: "🎯", desc: "Prepare for college placements" },
+//   { id: "switch", label: "Job Switch", icon: "🔄", desc: "Switch to a better role" },
+//   { id: "upskill", label: "Upskilling", icon: "📈", desc: "Level up current skills" },
+//   { id: "internship", label: "Internship", icon: "💼", desc: "Land an internship" },
+// ];
 
 const SKILLS_TO_LEARN = [
   { id: "dsa", label: "Data Structures & Algorithms", icon: "🔢" },
@@ -43,37 +48,33 @@ const KNOWN_LANGUAGES = [
   { id: "dart", label: "Dart", icon: "🎯" },
 ];
 
-const TIME_AVAILABILITY = [
-  { id: "1-month", label: "1 Month", icon: "⚡", desc: "Intensive crash course" },
-  { id: "2-months", label: "2 Months", icon: "🔥", desc: "Fast-paced learning" },
-  { id: "3-months", label: "3 Months", icon: "📅", desc: "Balanced approach" },
-  { id: "6-months", label: "6 Months", icon: "📚", desc: "Thorough preparation" },
-  { id: "12-months", label: "12 Months", icon: "🎯", desc: "Comprehensive mastery" },
-];
+// const TIME_AVAILABILITY = [
+//   { id: "1-month", label: "1 Month", icon: "⚡", desc: "Intensive crash course" },
+//   { id: "2-months", label: "2 Months", icon: "🔥", desc: "Fast-paced learning" },
+//   { id: "3-months", label: "3 Months", icon: "📅", desc: "Balanced approach" },
+//   { id: "6-months", label: "6 Months", icon: "📚", desc: "Thorough preparation" },
+//   { id: "12-months", label: "12 Months", icon: "🎯", desc: "Comprehensive mastery" },
+// ];
 
-const EXPERIENCE_LEVELS = [
-  { id: "fresher", label: "Fresher", desc: "No prior experience", icon: "🌱" },
-  { id: "beginner", label: "Beginner", desc: "Less than 1 year", icon: "📚" },
-  { id: "intermediate", label: "Intermediate", desc: "1-3 years experience", icon: "⚡" },
-  { id: "experienced", label: "Experienced", desc: "3+ years experience", icon: "🚀" },
-];
+// const EXPERIENCE_LEVELS = [
+//   { id: "fresher", label: "Fresher", desc: "No prior experience", icon: "🌱" },
+//   { id: "beginner", label: "Beginner", desc: "Less than 1 year", icon: "📚" },
+//   { id: "intermediate", label: "Intermediate", desc: "1-3 years experience", icon: "⚡" },
+//   { id: "experienced", label: "Experienced", desc: "3+ years experience", icon: "🚀" },
+// ];
 
-const TOTAL_STEPS = 5;
+const TOTAL_STEPS = 2;
 
 export default function SetupPage() {
   const router = useRouter();
+  const { user, isAuthenticated, loading, refreshUser } = useAuth();
   const [step, setStep] = useState(1);
   
-  // Auth states
-  const [isAuthenticated, setIsAuthenticated] = useState(null);
-  const [isSetupCompleted, setIsSetupCompleted] = useState(null);
-  
-  // Form states (Step 1,4,5 single select; Step 2,3 multi-select)
-  const [selectedGoal, setSelectedGoal] = useState("");
-  const [selectedSkills, setSelectedSkills] = useState([]);
+  // Form states
+  // Honest defaults - no fake data
+  // V1 is single-track (DSA), so we model it as a single string, not an array
+  const [selectedTrack, setSelectedTrack] = useState(""); 
   const [knownLanguages, setKnownLanguages] = useState([]);
-  const [timeAvailability, setTimeAvailability] = useState("");
-  const [experienceLevel, setExperienceLevel] = useState("");
   
   // UI states
   const [isLoading, setIsLoading] = useState(false);
@@ -81,45 +82,16 @@ export default function SetupPage() {
 
   // Check authentication on mount
   useEffect(() => {
-    async function checkAuth() {
-      try {
-        const res = await fetch(`${APP_URL}/api/current_user`, {
-          credentials: "include",
-        });
-        
-        if (res.ok) {
-          const data = await res.json();
-          setIsAuthenticated(true);
-          setIsSetupCompleted(data.is_setup_completed);
-          
-          // Redirect if setup already completed
-          if (data.is_setup_completed) {
-            router.push("/dashboard");
-          }
-        } else {
-          setIsAuthenticated(false);
-          router.push("/auth/login");
-        }
-      } catch (err) {
-        setIsAuthenticated(false);
+    if (!loading) {
+      if (!isAuthenticated) {
         router.push("/auth/login");
+      } else if (user && user.is_setup_completed) {
+        router.push("/dashboard");
       }
     }
-    checkAuth();
-  }, [router]);
+  }, [user, isAuthenticated, loading, router]);
 
-  const handleComplete = async () => {
-    setError("");
-    setIsLoading(true);
-    
-    const setupData = {
-      goal: selectedGoal,
-      goals: selectedSkills,
-      prior_exposure_languages: knownLanguages,
-      time_availability: timeAvailability,
-      experience_level: experienceLevel,
-    };
-    
+  const submitSetup = async (data) => {
     try {
       const res = await fetch(`${APP_URL}/api/setup_user`, {
         method: "POST",
@@ -127,15 +99,35 @@ export default function SetupPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(setupData),
+        body: JSON.stringify(data),
       });
       
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.detail || "Setup failed");
       }
+
+      // Initialize roadmap
+      const roadmapRes = await fetch(`${APP_URL}/roadmap/init`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({}),
+      });
+
+      if (!roadmapRes.ok) {
+        const errorData = await roadmapRes.json();
+        throw new Error(errorData.detail || "Roadmap initialization failed");
+      }
       
-      setIsSetupCompleted(true);
+      // Update user state to reflect setup completion before redirection
+      if (refreshUser) {
+        await refreshUser();
+      }
+
+      // Force a router refresh or push to ensure auth state updates
       router.push("/dashboard");
     } catch (err) {
       setError(err.message || "Something went wrong. Please try again.");
@@ -144,32 +136,41 @@ export default function SetupPage() {
     }
   };
 
+  const handleComplete = async () => {
+    setError("");
+    setIsLoading(true);
+    
+    const setupData = {
+      // Map single track to backend expected array format
+      goals: selectedTrack ? [selectedTrack] : [],
+      prior_exposure_languages: knownLanguages,
+    };
+    
+    await submitSetup(setupData);
+  };
+
+  const handleDefaultSetup = async () => {
+    setError("");
+    setIsLoading(true);
+
+    const defaultData = {
+      goals: ["dsa"],
+      prior_exposure_languages: ["python"],
+    };
+
+    await submitSetup(defaultData);
+  };
+
   const canProceed = () => {
     switch (step) {
-      case 1: return selectedGoal !== "";
-      case 2: return selectedSkills.length > 0;
-      case 3: return knownLanguages.length > 0;
-      case 4: return timeAvailability !== "";
-      case 5: return experienceLevel !== "";
+      case 1: return selectedTrack !== "";
+      case 2: return true; // Allow empty languages for complete beginners
       default: return false;
     }
   };
 
-  // Toggle function for multi-select
-  const toggleSelection = (id, selected, setSelected, maxSelections = null) => {
-    if (selected.includes(id)) {
-      setSelected(selected.filter(item => item !== id));
-    } else {
-      // Check max selections limit
-      if (maxSelections && selected.length >= maxSelections) {
-        return; // Don't add more if limit reached
-      }
-      setSelected([...selected, id]);
-    }
-  };
-
   // Show loading while checking auth
-  if (isAuthenticated === null) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-[#030712] flex items-center justify-center">
         <div className="animate-spin w-8 h-8 border-2 border-violet-500 border-t-transparent rounded-full" />
@@ -183,91 +184,47 @@ export default function SetupPage() {
         return (
           <>
             <div className="text-center mb-8">
-              <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-violet-500 to-purple-600 flex items-center justify-center mx-auto mb-4">
-                <span className="text-3xl">🎯</span>
-              </div>
-              <h1 className="text-2xl font-bold mb-2">What&apos;s your goal?</h1>
-              <p className="text-slate-400">Select your primary goal</p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
-              {GOALS.map((goal) => (
-                <button
-                  key={goal.id}
-                  onClick={() => setSelectedGoal(goal.id)}
-                  className={`p-4 rounded-xl border text-left transition-all group ${
-                    selectedGoal === goal.id
-                      ? "border-violet-500 bg-violet-500/10 shadow-lg shadow-violet-500/10"
-                      : "border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/8"
-                  }`}
-                >
-                  <div className="flex items-start gap-3">
-                    <span className="text-2xl">{goal.icon}</span>
-                    <div className="flex-1">
-                      <span className="font-medium block">{goal.label}</span>
-                      <span className="text-xs text-slate-400">{goal.desc}</span>
-                    </div>
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
-                      selectedGoal === goal.id
-                        ? "border-violet-500 bg-violet-500"
-                        : "border-white/20"
-                    }`}>
-                      {selectedGoal === goal.id && (
-                        <div className="w-2 h-2 rounded-full bg-white" />
-                      )}
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </>
-        );
-
-      case 2:
-        return (
-          <>
-            <div className="text-center mb-8">
               <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-cyan-500 to-blue-600 flex items-center justify-center mx-auto mb-4">
                 <span className="text-3xl">📚</span>
               </div>
               <h1 className="text-2xl font-bold mb-2">What do you want to learn?</h1>
-              <p className="text-slate-400">Select up to 2 skills you want to focus on</p>
-              <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20">
-                <span className={`text-xs font-medium ${selectedSkills.length === 2 ? 'text-emerald-400' : 'text-cyan-400'}`}>
-                  {selectedSkills.length}/2 selected
-                </span>
-              </div>
+              <p className="text-slate-400">Select a skill to focus on</p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
               {SKILLS_TO_LEARN.map((skill) => {
-                const isSelected = selectedSkills.includes(skill.id);
-                const isDisabled = !isSelected && selectedSkills.length >= 2;
+                const isSelected = selectedTrack === skill.id;
+                const isDisabled = skill.id !== 'dsa'; // Only DSA is enabled for v1
+                
                 return (
                   <button
                     key={skill.id}
-                    onClick={() => toggleSelection(skill.id, selectedSkills, setSelectedSkills, 2)}
+                    onClick={() => setSelectedTrack(skill.id)}
                     disabled={isDisabled}
-                    className={`p-4 rounded-xl border text-left transition-all ${
+                    className={`p-4 rounded-xl border text-left transition-all relative overflow-hidden ${
                       isSelected
                         ? "border-cyan-500 bg-cyan-500/10 shadow-lg shadow-cyan-500/10"
                         : isDisabled
-                        ? "border-white/5 bg-white/2 opacity-50 cursor-not-allowed"
+                        ? "border-white/5 bg-white/2 opacity-60 cursor-not-allowed"
                         : "border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/8"
                     }`}
                   >
                     <div className="flex items-center gap-3">
                       <span className="text-xl">{skill.icon}</span>
-                      <span className="font-medium flex-1">{skill.label}</span>
-                      <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${
+                      <div className="flex-1">
+                        <span className="font-medium block">{skill.label}</span>
+                        {isDisabled && (
+                          <span className="text-[10px] uppercase tracking-wider text-amber-400 font-mono">Coming Soon</span>
+                        )}
+                      </div>
+                      
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
                         isSelected
                           ? "border-cyan-500 bg-cyan-500"
                           : "border-white/20"
                       }`}>
                         {isSelected && (
-                          <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                          </svg>
+                          <div className="w-2 h-2 rounded-full bg-white" />
                         )}
                       </div>
                     </div>
@@ -278,7 +235,7 @@ export default function SetupPage() {
           </>
         );
 
-      case 3:
+      case 2:
         return (
           <>
             <div className="text-center mb-8">
@@ -300,7 +257,13 @@ export default function SetupPage() {
                 return (
                   <button
                     key={lang.id}
-                    onClick={() => toggleSelection(lang.id, knownLanguages, setKnownLanguages)}
+                    onClick={() => {
+                      setKnownLanguages(prev => 
+                        prev.includes(lang.id) 
+                          ? prev.filter(l => l !== lang.id) 
+                          : [...prev, lang.id]
+                      );
+                    }}
                     className={`p-4 rounded-xl border text-center transition-all relative ${
                       isSelected
                         ? "border-emerald-500 bg-emerald-500/10 shadow-lg shadow-emerald-500/10"
@@ -327,94 +290,6 @@ export default function SetupPage() {
           </>
         );
 
-      case 4:
-        return (
-          <>
-            <div className="text-center mb-8">
-              <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-amber-500 to-orange-600 flex items-center justify-center mx-auto mb-4">
-                <span className="text-3xl">📆</span>
-              </div>
-              <h1 className="text-2xl font-bold mb-2">How long do you have to prepare?</h1>
-              <p className="text-slate-400">Timeline to complete your selected skills</p>
-            </div>
-
-            <div className="space-y-3 mb-8">
-              {TIME_AVAILABILITY.map((time) => (
-                <button
-                  key={time.id}
-                  onClick={() => setTimeAvailability(time.id)}
-                  className={`w-full p-4 rounded-xl border text-left transition-all ${
-                    timeAvailability === time.id
-                      ? "border-amber-500 bg-amber-500/10 shadow-lg shadow-amber-500/10"
-                      : "border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/8"
-                  }`}
-                >
-                  <div className="flex items-center gap-4">
-                    <span className="text-2xl">{time.icon}</span>
-                    <div className="flex-1">
-                      <span className="font-medium block">{time.label}</span>
-                      <span className="text-xs text-slate-400">{time.desc}</span>
-                    </div>
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
-                      timeAvailability === time.id
-                        ? "border-amber-500 bg-amber-500"
-                        : "border-white/20"
-                    }`}>
-                      {timeAvailability === time.id && (
-                        <div className="w-2 h-2 rounded-full bg-white" />
-                      )}
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </>
-        );
-
-      case 5:
-        return (
-          <>
-            <div className="text-center mb-8">
-              <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-pink-500 to-rose-600 flex items-center justify-center mx-auto mb-4">
-                <span className="text-3xl">🎓</span>
-              </div>
-              <h1 className="text-2xl font-bold mb-2">What&apos;s your experience level?</h1>
-              <p className="text-slate-400">This helps us personalize your learning path</p>
-            </div>
-
-            <div className="space-y-3 mb-8">
-              {EXPERIENCE_LEVELS.map((level) => (
-                <button
-                  key={level.id}
-                  onClick={() => setExperienceLevel(level.id)}
-                  className={`w-full p-4 rounded-xl border text-left transition-all ${
-                    experienceLevel === level.id
-                      ? "border-pink-500 bg-pink-500/10 shadow-lg shadow-pink-500/10"
-                      : "border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/8"
-                  }`}
-                >
-                  <div className="flex items-center gap-4">
-                    <span className="text-2xl">{level.icon}</span>
-                    <div className="flex-1">
-                      <span className="font-medium block">{level.label}</span>
-                      <span className="text-xs text-slate-400">{level.desc}</span>
-                    </div>
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
-                      experienceLevel === level.id
-                        ? "border-pink-500 bg-pink-500"
-                        : "border-white/20"
-                    }`}>
-                      {experienceLevel === level.id && (
-                        <div className="w-2 h-2 rounded-full bg-white" />
-                      )}
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </>
-        );
-
       default:
         return null;
     }
@@ -422,13 +297,10 @@ export default function SetupPage() {
 
   const getStepColor = (stepNum) => {
     const colors = {
-      1: "violet",
-      2: "cyan",
-      3: "emerald",
-      4: "amber",
-      5: "pink",
+      1: "cyan",
+      2: "emerald",
     };
-    return colors[stepNum] || "violet";
+    return colors[stepNum] || "cyan";
   };
 
   return (
@@ -460,16 +332,13 @@ export default function SetupPage() {
           
           {/* Step indicators */}
           <div className="flex gap-2 mb-2">
-            {[1, 2, 3, 4, 5].map((s) => (
+            {[1, 2].map((s) => (
               <div
                 key={s}
                 className={`h-2 flex-1 rounded-full transition-all duration-500 ${
                   s <= step
-                    ? s === 1 ? "bg-violet-500" :
-                      s === 2 ? "bg-cyan-500" :
-                      s === 3 ? "bg-emerald-500" :
-                      s === 4 ? "bg-amber-500" :
-                      "bg-pink-500"
+                    ? s === 1 ? "bg-cyan-500" :
+                      "bg-emerald-500"
                     : "bg-white/10"
                 }`}
               />
@@ -478,6 +347,11 @@ export default function SetupPage() {
         </div>
 
         <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-6 sm:p-8">
+          {!APP_URL && (
+            <div className="mb-6 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center">
+              Configuration Error: NEXT_PUBLIC_APP_URL is missing.
+            </div>
+          )}
           {error && (
             <div className="mb-6 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center">
               {error}
@@ -502,13 +376,10 @@ export default function SetupPage() {
             )}
             <button
               onClick={() => step === TOTAL_STEPS ? handleComplete() : setStep(step + 1)}
-              disabled={!canProceed() || isLoading}
+              disabled={!canProceed() || isLoading || !APP_URL}
               className={`flex-1 py-3 rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 ${
-                step === 1 ? "bg-linear-to-r from-violet-600 to-purple-600 hover:shadow-lg hover:shadow-violet-500/25" :
-                step === 2 ? "bg-linear-to-r from-cyan-600 to-blue-600 hover:shadow-lg hover:shadow-cyan-500/25" :
-                step === 3 ? "bg-linear-to-r from-emerald-600 to-teal-600 hover:shadow-lg hover:shadow-emerald-500/25" :
-                step === 4 ? "bg-linear-to-r from-amber-600 to-orange-600 hover:shadow-lg hover:shadow-amber-500/25" :
-                "bg-linear-to-r from-pink-600 to-rose-600 hover:shadow-lg hover:shadow-pink-500/25"
+                step === 1 ? "bg-linear-to-r from-cyan-600 to-blue-600 hover:shadow-lg hover:shadow-cyan-500/25" :
+                "bg-linear-to-r from-emerald-600 to-teal-600 hover:shadow-lg hover:shadow-emerald-500/25"
               }`}
             >
               {isLoading ? (
@@ -532,14 +403,14 @@ export default function SetupPage() {
           </div>
         </div>
 
-        {/* Skip option */}
-        <button
-          onClick={handleComplete}
-          disabled={isLoading}
+        {/* Default Setup option */}
+        {/* <button
+          onClick={handleDefaultSetup}
+          disabled={isLoading || !APP_URL}
           className="mt-4 w-full text-center text-sm text-slate-500 hover:text-slate-300 transition-colors disabled:opacity-50"
         >
-          Skip setup and go to dashboard →
-        </button>
+          Skip setup and start with defaults (DSA + Python) →
+        </button> */}
       </div>
     </div>
   );

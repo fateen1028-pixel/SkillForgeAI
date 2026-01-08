@@ -1,0 +1,329 @@
+skill: arrays
+version: v1
+description: >
+  Arrays curriculum focused on installing correct memory, cost, access,
+  and boundary mental models. Each slot enforces a specific invariant.
+
+# =========================================================
+# SLOT 1 — MEMORY & INDEX MODEL
+# =========================================================
+
+slots:
+  - slot_id: ARRAY_SLOT_1_MEMORY_MODEL
+    mental_install: "Arrays are contiguous memory blocks; index maps directly to address."
+    invariant: "address(i) = base_address + i * element_size"
+    mastery_signals:
+      - Explains contiguous allocation
+      - Computes address offsets correctly
+      - Describes constant-time index access
+    hard_failures:
+      - Thinks arrays are linked structures
+      - Cannot explain why access is O(1)
+      - Confuses index with value
+
+    templates:
+      - id: arrays_s1_address_math
+        type: explanation
+        difficulty: easy
+        prompt: |
+          An integer array starts at memory address 2000.
+          Each integer occupies 4 bytes.
+          1) What is the address of arr[5]?
+          2) Why does this not depend on array length?
+        rubric: >
+          Must compute 2020 and explain index arithmetic and constant-time access.
+        concepts: [memory_model, indexing, constant_time]
+
+      - id: arrays_s1_index_access
+        type: coding
+        difficulty: easy
+        prompt: "Return the element at index k. Assume valid input."
+        language: python
+        starter_code: |
+          def solve(arr, k):
+              pass
+        concepts: [indexing, direct_access]
+
+      - id: arrays_s1_remediation_memory
+        base_id: arrays_s1_address_math
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Re-explain how arrays are stored in memory and why arr[i] is O(1).
+          Include the address formula and one numeric example.
+
+# =========================================================
+# SLOT 2 — ITERATION & ACCUMULATION
+# =========================================================
+
+  - slot_id: ARRAY_SLOT_2_ITERATION
+    mental_install: "Arrays are traversed sequentially; state is built across indices."
+    invariant: "Every traversal must respect 0 ≤ i < size"
+    mastery_signals:
+      - Correct loop bounds
+      - Handles empty arrays
+      - Accumulates without off-by-one errors
+    hard_failures:
+      - Skips first/last element
+      - Fails on empty array
+      - Uses length incorrectly
+
+    templates:
+      - id: arrays_s2_sum
+        type: coding
+        difficulty: easy
+        prompt: "Return the sum of all elements. Do not use built-in sum()."
+        language: python
+        starter_code: |
+          def solve(arr):
+              pass
+        concepts: [iteration, accumulation]
+
+      - id: arrays_s2_min_max
+        type: coding
+        difficulty: easy
+        prompt: "Return both the smallest and largest element."
+        language: python
+        starter_code: |
+          def solve(arr):
+              pass
+        concepts: [iteration, state_tracking]
+
+      - id: arrays_s2_trace_loop
+        type: explanation
+        difficulty: easy
+        prompt: |
+          Trace a loop that sums [4, -2, 7].
+          Show the value of 'total' after each iteration.
+        rubric: "Must show step-by-step state update."
+        concepts: [loop_trace, accumulation]
+
+# =========================================================
+# SLOT 3 — SUBARRAY & RANGE THINKING
+# =========================================================
+
+  - slot_id: ARRAY_SLOT_3_SUBARRAY
+    mental_install: "Subarrays are contiguous ranges defined by boundaries."
+    invariant: "A subarray is fully described by [start, end] indices."
+    mastery_signals:
+      - Correctly identifies subarrays
+      - Builds nested loops safely
+      - Explains O(n²) generation cost
+    hard_failures:
+      - Confuses subsequence with subarray
+      - Breaks boundaries
+      - Skips valid ranges
+
+    templates:
+      - id: arrays_s3_list_subarrays
+        type: explanation
+        difficulty: easy
+        prompt: |
+          List all subarrays of [1, 2, 3].
+          Show them using index ranges.
+        rubric: "Must list 6 subarrays and correct ranges."
+        concepts: [subarray, boundaries]
+
+      - id: arrays_s3_subarray_sum
+        type: coding
+        difficulty: medium
+        prompt: "Count how many subarrays have sum = k."
+        language: python
+        starter_code: |
+          def solve(arr, k):
+              pass
+        concepts: [nested_loops, subarray]
+
+# =========================================================
+# SLOT 4 — SHIFTING & STRUCTURAL COST
+# =========================================================
+
+  - slot_id: ARRAY_SLOT_4_SHIFTING_MODEL
+    mental_install: "Insertion/deletion requires physical shifting of elements."
+    invariant: "Number of shifts = number of elements after the position."
+    mastery_signals:
+      - Manually counts shifts
+      - Predicts operation cost
+      - Implements shift logic
+    hard_failures:
+      - Thinks insertion is constant-time everywhere
+      - Overwrites data
+      - Breaks order invariant
+
+    templates:
+      - id: arrays_s4_shift_count
+        type: explanation
+        difficulty: medium
+        prompt: |
+          An array of size 7.
+          How many elements shift when inserting at:
+          a) index 0
+          b) index 3
+          c) index 7
+        rubric: "Must compute shifts and relate to cost."
+        concepts: [shifting, cost_model]
+
+      - id: arrays_s4_manual_insert
+        type: coding
+        difficulty: medium
+        prompt: "Insert value x at index i without using insert(). Return new array."
+        language: python
+        starter_code: |
+          def solve(arr, i, x):
+              pass
+        concepts: [shifting, boundaries]
+
+# =========================================================
+# SLOT 5 — COST AWARENESS BY POSITION
+# =========================================================
+
+  - slot_id: ARRAY_SLOT_5_POSITIONAL_COST
+    mental_install: "Operation cost depends on position due to shifting distance."
+    invariant: "Cost ∝ number of elements moved"
+    mastery_signals:
+      - Predicts relative costs
+      - Chooses append when possible
+      - Avoids middle insertion
+    hard_failures:
+      - Implements queues with front deletion
+      - Cannot justify append efficiency
+      - Randomly chooses insertion positions
+
+    templates:
+      - id: arrays_s5_cost_analysis
+        type: explanation
+        difficulty: medium
+        prompt: |
+          You must support 100k operations.
+          Which is cheaper and why:
+          frequent appends or frequent front insertions?
+        rubric: "Must reference shifting cost and O(n) vs O(1)."
+        concepts: [cost_analysis, performance]
+
+      - id: arrays_s5_stack_impl
+        type: coding
+        difficulty: medium
+        prompt: "Implement a stack using only an array."
+        language: python
+        starter_code: |
+          class Stack:
+              def __init__(self):
+                  self.arr = []
+              def push(self, x):
+                  pass
+              def pop(self):
+                  pass
+        concepts: [append_pop, cost_awareness]
+
+# =========================================================
+# SLOT 6 — RANDOM ACCESS VS SEARCH
+# =========================================================
+
+  - slot_id: ARRAY_SLOT_6_ACCESS_VS_SEARCH
+    mental_install: "Index lookup is not value search; sortedness trades insertion cost for search speed."
+    invariant: "Access O(1); search O(n) unsorted, O(log n) sorted."
+    mastery_signals:
+      - Distinguishes arr[i] from find(x)
+      - Implements binary search correctly
+      - Preserves sorted invariant
+    hard_failures:
+      - Uses binary search on unsorted data
+      - Sorts without cost reasoning
+      - Cannot explain tradeoff
+
+    templates:
+      - id: arrays_s6_binary_search
+        type: coding
+        difficulty: medium
+        prompt: "Implement binary search on a sorted array."
+        language: python
+        starter_code: |
+          def solve(arr, target):
+              pass
+        concepts: [binary_search, sorted_arrays]
+
+      - id: arrays_s6_tradeoff_explain
+        type: explanation
+        difficulty: medium
+        prompt: |
+          Why does a sorted array improve search but worsen insertion?
+        rubric: "Must reference binary search and shifting cost."
+        concepts: [tradeoffs, invariants]
+
+# =========================================================
+# SLOT 7 — BOUNDARY LITERACY & CAPACITY THINKING
+# =========================================================
+
+  - slot_id: ARRAY_SLOT_7_BOUNDARIES
+    mental_install: "Edges define correctness; size and capacity are distinct."
+    invariant: "0 ≤ index < size ≤ capacity"
+    mastery_signals:
+      - Handles empty arrays
+      - Correct wrap-around
+      - Uses size vs capacity
+    hard_failures:
+      - Off-by-one errors
+      - Confuses full vs empty
+      - Corrupts circular buffers
+
+    templates:
+      - id: arrays_s7_safe_access
+        type: coding
+        difficulty: medium
+        prompt: "Implement safe_get(arr, i) returning None if out of bounds."
+        language: python
+        starter_code: |
+          def safe_get(arr, i):
+              pass
+        concepts: [bounds_checking]
+
+      - id: arrays_s7_circular_buffer
+        type: coding
+        difficulty: hard
+        prompt: "Implement a circular queue using a fixed-size array."
+        language: python
+        starter_code: |
+          class CircularQueue:
+              def __init__(self, k):
+                  pass
+              def enqueue(self, x):
+                  pass
+              def dequeue(self):
+                  pass
+        concepts: [circular_array, capacity_model]
+
+# =========================================================
+# SLOT 8 — SUBARRAY OPTIMIZATION (ADVANCED)
+# =========================================================
+
+  - slot_id: ARRAY_SLOT_8_OPTIMIZATION
+    mental_install: "State compression reduces repeated subarray computation."
+    invariant: "Each step updates optimal prefix state."
+    mastery_signals:
+      - Derives Kadane logically
+      - Explains why it works
+      - Handles all-negative case
+    hard_failures:
+      - Memorizes formula
+      - Breaks on negative arrays
+      - Cannot justify transitions
+
+    templates:
+      - id: arrays_s8_kadane
+        type: coding
+        difficulty: hard
+        prompt: "Find the maximum subarray sum."
+        language: python
+        starter_code: |
+          def max_subarray(arr):
+              pass
+        concepts: [prefix_state, dynamic_optimization]
+
+      - id: arrays_s8_kadane_explain
+        type: explanation
+        difficulty: hard
+        prompt: |
+          Explain why Kadane’s algorithm works using prefix reasoning.
+        rubric: "Must reference local vs global optimal states."
+        concepts: [mental_model, optimization]

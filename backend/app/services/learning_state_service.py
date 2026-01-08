@@ -1,9 +1,10 @@
+from typing import Optional
 from app.db import learning_state_repo
 from app.schemas.learning_state import UserLearningState
 from fastapi import HTTPException, status
 from datetime import datetime
 
-async def create_initial_learning_state(db, user_id: str, roadmap_id: str = None, setup_profile: dict = None):
+async def create_initial_learning_state(db, user_id: str, roadmap_id: Optional[str] = None, setup_profile: Optional[dict] = None):
     # Create a new user_learning_state document for the user
     return await learning_state_repo.create_user_learning_state(db, user_id, roadmap_id, setup_profile=setup_profile)
 

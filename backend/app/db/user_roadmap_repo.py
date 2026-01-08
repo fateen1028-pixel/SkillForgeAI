@@ -42,6 +42,14 @@ class UserRoadmapRepo:
         data = roadmap.model_dump()
         data["user_id"] = str(data["user_id"])
 
+        # FIX: Convert sets to lists for MongoDB (specifically TaskSlot.flags)
+        if "phases" in data:
+            for phase in data["phases"]:
+                if "slots" in phase:
+                    for slot in phase["slots"]:
+                        if "flags" in slot and isinstance(slot["flags"], set):
+                            slot["flags"] = list(slot["flags"])
+
         if is_new:
             data["is_active"] = True
 

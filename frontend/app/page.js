@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import {useRouter} from "next/navigation";
 import Link from "next/link";
+import { useAuth } from "@/hooks/useAuth";
 
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL;
@@ -77,6 +78,7 @@ function BrandName({ size = "default" }) {
 
 export default function Home() {
   const router = useRouter();
+  const { user, isAuthenticated, loading } = useAuth();
   const observerRef = useRef(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -84,52 +86,21 @@ export default function Home() {
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [navScrolled, setNavScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isSetupCompleted, setIsSetupCompleted] = useState(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(null); // null = loading
 
   // Handle Get Started button click
   const handleClick = async () => {
-    if (isAuthenticated === null) return; // Still loading
+    if (loading) return; // Still loading
     
     if (!isAuthenticated) {
       router.push("/auth/login");
-    } else if (isSetupCompleted) {
+    } else if (user && user.is_setup_completed) {
       router.push("/dashboard");
     } else {
       router.push("/setup");
     }
   };
 
-  // Fetch user authentication status
-  useEffect(() => {
-    async function fetchUser() {
-      try {
-        const res = await fetch(`${APP_URL}/api/current_user`, {
-          credentials: "include",
-        });
-        
-        if (res.status === 401) {
-          setIsAuthenticated(false);
-          setIsSetupCompleted(null);
-          return;
-        }
-        
-        if (!res.ok) {
-          throw new Error("Failed to fetch user");
-        }
-        
-        const data = await res.json();
-        setIsAuthenticated(true);
-        setIsSetupCompleted(data.is_setup_completed);
-      } catch (err) {
-        console.error("Auth check failed:", err);
-        setIsAuthenticated(false);
-        setIsSetupCompleted(null);
-      }
-    }
 
-    fetchUser();
-  }, []);
 
   // Handle scroll progress and back to top visibility
   useEffect(() => {
@@ -217,7 +188,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#030712] text-white overflow-x-hidden scroll-smooth">
       {/* Scroll Progress Bar */}
-      <div className="fixed top-0 left-0 right-0 z-[100] h-1 bg-transparent">
+      <div className="fixed top-0 left-0 right-0 z-100 h-1 bg-transparent">
         <div 
           className="h-full bg-linear-to-r from-[#7c3aed] via-[#6366f1] to-[#06b6d4] transition-all duration-150 ease-out shadow-lg shadow-[#7c3aed]/50"
           style={{ width: `${scrollProgress}%` }}
@@ -239,7 +210,7 @@ export default function Home() {
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         {/* Mouse follower gradient */}
         <div
-          className="absolute w-[800px] h-[800px] rounded-full opacity-20 blur-[150px] transition-all duration-1000 ease-out"
+          className="absolute w-200 h-200 rounded-full opacity-20 blur-[150px] transition-all duration-1000 ease-out"
           style={{
             background: "radial-gradient(circle, #7c3aed 0%, transparent 70%)",
             left: mousePosition.x - 400,
@@ -248,9 +219,9 @@ export default function Home() {
         />
 
         {/* Static gradient orbs */}
-        <div className="absolute top-[-15%] left-[-8%] w-[500px] h-[500px] md:w-[700px] md:h-[700px] bg-[#7c3aed]/25 rounded-full blur-[120px] animate-float" />
-        <div className="absolute top-[40%] right-[-12%] w-[400px] h-[400px] md:w-[600px] md:h-[600px] bg-[#06b6d4]/20 rounded-full blur-[100px] animate-float-delayed" />
-        <div className="absolute bottom-[-15%] left-[25%] w-[350px] h-[350px] md:w-[500px] md:h-[500px] bg-[#ec4899]/15 rounded-full blur-[100px] animate-float" />
+        <div className="absolute top-[-15%] left-[-8%] w-125 h-125 md:w-175 md:h-175 bg-[#7c3aed]/25 rounded-full blur-[120px] animate-float" />
+        <div className="absolute top-[40%] right-[-12%] w-100 h-100 md:w-150 md:h-150 bg-[#06b6d4]/20 rounded-full blur-[100px] animate-float-delayed" />
+        <div className="absolute bottom-[-15%] left-[25%] w-87.5 h-87.5 md:w-125 md:h-125 bg-[#ec4899]/15 rounded-full blur-[100px] animate-float" />
 
         {/* Mesh gradient overlay */}
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-60" />
@@ -538,11 +509,11 @@ export default function Home() {
                   <div className="p-3 sm:p-4 md:p-6 space-y-3 sm:space-y-4">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div>
-                        <div className="h-5 sm:h-6 w-28 sm:w-36 bg-gradient-to-r from-white/10 to-white/5 rounded-lg" />
+                        <div className="h-5 sm:h-6 w-28 sm:w-36 bg-linear-to-r from-white/10 to-white/5 rounded-lg" />
                         <div className="h-3 sm:h-4 w-40 sm:w-52 bg-white/5 rounded mt-2" />
                       </div>
                       <div className="flex gap-2">
-                        <div className="h-8 sm:h-10 w-20 sm:w-24 bg-gradient-to-r from-[#7c3aed]/30 to-[#7c3aed]/10 rounded-xl border border-[#7c3aed]/20" />
+                        <div className="h-8 sm:h-10 w-20 sm:w-24 bg-linear-to-r from-[#7c3aed]/30 to-[#7c3aed]/10 rounded-xl border border-[#7c3aed]/20" />
                         <div className="h-8 sm:h-10 w-20 sm:w-24 bg-white/5 rounded-xl border border-white/5" />
                         <div className="hidden sm:block h-10 w-24 bg-white/5 rounded-xl border border-white/5" />
                       </div>

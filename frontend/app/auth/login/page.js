@@ -1,30 +1,33 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { useAuth } from "@/hooks/useAuth";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const sessionExpired = searchParams.get('expired') === 'true';
+  
   const { login, user, loading: authLoading } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(sessionExpired ? "Your session has expired. Please log in again." : "");
 
   // Check if user is already logged in
   useEffect(() => {
-    if (!authLoading && user) {
+    if (!authLoading && user && !sessionExpired) {
       if (user.is_setup_completed) {
         router.push("/dashboard");
       } else {
         router.push("/setup");
       }
     }
-  }, [user, authLoading, router]);
+  }, [user, authLoading, router, sessionExpired]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -232,5 +235,13 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#030712] flex items-center justify-center text-white">Loading...</div>}>
+      <LoginForm />
+    </Suspense>
   );
 }

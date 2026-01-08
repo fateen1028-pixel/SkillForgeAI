@@ -1,0 +1,202 @@
+track_id: dsa
+name: Data Structures & Algorithms
+version: v2
+
+description: >
+  A mental-model-driven DSA track that installs computational reasoning
+  primitives. Progression is governed by invariant mastery, not problem
+  completion. Structures are installed before algorithms.
+
+phases:
+
+# =========================================================
+# PHASE 1 — CONTIGUOUS MEMORY & SYMBOL SEQUENCES
+# =========================================================
+
+  - phase_id: DSA_PHASE_1_CONTIGUOUS_MEMORY
+    name: Contiguous Memory & Symbolic Sequences
+    objective: >
+      Install contiguous memory reasoning, index arithmetic, iteration,
+      boundary discipline, and symbolic sequence manipulation.
+
+    unlock_condition:
+      type: all_slots_mastered
+
+    mastery:
+      pass_score: 0.70
+      min_confidence: 0.50
+
+    slots:
+
+      # -------- ARRAYS --------
+
+      - slot_id: ARRAY_SLOT_1_MEMORY_MODEL
+        skill: arrays
+
+      - slot_id: ARRAY_SLOT_2_ITERATION
+        skill: arrays
+
+      - slot_id: ARRAY_SLOT_3_SUBARRAY
+        skill: arrays
+
+      - slot_id: ARRAY_SLOT_4_SHIFTING_MODEL
+        skill: arrays
+
+      - slot_id: ARRAY_SLOT_5_POSITIONAL_COST
+        skill: arrays
+
+      - slot_id: ARRAY_SLOT_6_ACCESS_VS_SEARCH
+        skill: arrays
+
+      - slot_id: ARRAY_SLOT_7_BOUNDARIES
+        skill: arrays
+
+      - slot_id: ARRAY_SLOT_8_OPTIMIZATION
+        skill: arrays
+
+      # -------- STRINGS --------
+
+      - slot_id: STRING_SLOT_1_MEMORY_MODEL
+        skill: strings
+
+      - slot_id: STRING_SLOT_2_TRAVERSAL
+        skill: strings
+
+      - slot_id: STRING_SLOT_3_SUBSTRINGS
+        skill: strings
+
+      - slot_id: STRING_SLOT_4_COST_MODEL
+        skill: strings
+
+      - slot_id: STRING_SLOT_5_PATTERN_MATCHING
+        skill: strings
+
+      - slot_id: STRING_SLOT_6_ENCODING
+        skill: strings
+
+# =========================================================
+# PHASE 2 — INDIRECT MEMORY & POINTER STRUCTURES
+# =========================================================
+
+  - phase_id: DSA_PHASE_2_INDIRECTION
+    name: Indirection & Dynamic Memory
+    objective: >
+      Replace contiguous assumptions with pointer traversal, heap allocation,
+      node-based reasoning, and structural mutation.
+
+    unlock_condition:
+      type: phase_complete
+      requires: DSA_PHASE_1_CONTIGUOUS_MEMORY
+
+    mastery:
+      pass_score: 0.72
+      min_confidence: 0.55
+
+    slots:
+
+      - slot_id: LINKED_LIST_SLOT_1_NODE_MODEL
+        skill: linked_lists
+
+      - slot_id: LINKED_LIST_SLOT_2_TRAVERSAL
+        skill: linked_lists
+
+      - slot_id: LINKED_LIST_SLOT_3_INSERT_DELETE
+        skill: linked_lists
+
+      - slot_id: LINKED_LIST_SLOT_4_CYCLE_DETECTION
+        skill: linked_lists
+
+# =========================================================
+# PHASE 3 — ACCESS DISCIPLINE SYSTEMS
+# =========================================================
+
+  - phase_id: DSA_PHASE_3_DISCIPLINE
+    name: Access Discipline & Flow Control
+    objective: >
+      Install constrained-access structures, buffering, and operational flow control.
+
+    unlock_condition:
+      type: phase_complete
+      requires: DSA_PHASE_2_INDIRECTION
+
+    mastery:
+      pass_score: 0.75
+      min_confidence: 0.55
+
+    slots:
+
+      - slot_id: STACK_SLOT_1_LIFO
+        skill: stacks
+
+      - slot_id: STACK_SLOT_2_REVERSAL
+        skill: stacks
+
+      - slot_id: STACK_SLOT_3_MONOTONIC
+        skill: stacks
+
+      - slot_id: QUEUE_SLOT_1_FIFO
+        skill: queues
+
+      - slot_id: QUEUE_SLOT_2_BUFFERING
+        skill: queues
+
+# =========================================================
+# PHASE 4 — DIRECT INDEXING SYSTEMS
+# =========================================================
+
+  - phase_id: DSA_PHASE_4_INDEXING
+    name: Hashing & Direct Indexing
+    objective: >
+      Install key-space compression, collision reasoning,
+      and frequency modeling.
+
+    unlock_condition:
+      type: phase_complete
+      requires: DSA_PHASE_3_DISCIPLINE
+
+    mastery:
+      pass_score: 0.75
+      min_confidence: 0.60
+
+    slots:
+
+      - slot_id: HASH_SLOT_1_MAPPING
+        skill: hash_tables
+
+      - slot_id: HASH_SLOT_2_COLLISIONS
+        skill: hash_tables
+
+      - slot_id: HASH_SLOT_3_FREQUENCY
+        skill: hash_tables
+
+# =========================================================
+# PHASE 5 — HIERARCHICAL MEMORY
+# =========================================================
+
+  - phase_id: DSA_PHASE_5_HIERARCHY
+    name: Hierarchical Structures & Recursive Control
+    objective: >
+      Install tree-based reasoning, recursive aggregation,
+      and ordered structural invariants.
+
+    unlock_condition:
+      type: phase_complete
+      requires: DSA_PHASE_4_INDEXING
+
+    mastery:
+      pass_score: 0.78
+      min_confidence: 0.60
+
+    slots:
+
+      - slot_id: TREE_SLOT_1_STRUCTURE
+        skill: trees
+
+      - slot_id: TREE_SLOT_2_TRAVERSAL
+        skill: trees
+
+      - slot_id: TREE_SLOT_3_PROPERTIES
+        skill: trees
+
+      - slot_id: TREE_SLOT_4_BST
+        skill: trees

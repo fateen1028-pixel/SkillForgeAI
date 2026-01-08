@@ -28,12 +28,3 @@ class TaskInstance(BaseModel):
     completed_at: Optional[datetime] = None
 
     evaluation_signals: Dict[str, float] = Field(default_factory=dict)
-
-    @model_validator(mode="after")
-    def validate_template_relationship(self):
-        if not self.task_template_id.startswith(self.base_template_id):
-            raise ValueError(
-                f"task_template_id '{self.task_template_id}' "
-                f"is not derived from base_template_id '{self.base_template_id}'"
-            )
-        return self

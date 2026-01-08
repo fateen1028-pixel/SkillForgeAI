@@ -1,57 +1,79 @@
-from app.domain.task_templates import TASK_TEMPLATES
+from app.domain.task_template_loader import get_all_templates
 from app.schemas.roadmap_state import TaskSlot
 from app.core.exceptions import TemplateResolutionError
+from app.services.curriculum_service import CurriculumService
 
 
 def resolve_task_template_id(
     *,
     slot: TaskSlot,
-    base_template_id: str,
-    allow_fallback: bool = False,
+    track_id: str = "dsa",
 ) -> str:
     """
     Single source of truth for task template selection.
+    Respects the remediation pipeline (explanation -> guided_practice -> retry).
     """
-    # Find all templates that claim to be derived from this base ID
+    # 1. Find all templates tied to this slot
+    all_templates = get_all_templates()
     candidates = [
-        t for t in TASK_TEMPLATES.values()
-        if t.base_template_id == base_template_id
+        t for t in all_templates
+        if t.slot_id == slot.slot_id
     ]
 
     if not candidates:
         raise TemplateResolutionError(
-            f"Task template not found: {base_template_id}"
+            f"No templates found for slot ID: {slot.slot_id}"
         )
 
-    # Determine if we need a remediation template
+    # 2. Determine target variant and strategy
     is_remediation = (slot.status == "remediation_required")
-
-    # Filter candidates
-    matching_templates = []
-    for t in candidates:
-        is_rem_template = t.task_template_id.endswith("__remediation")
-        if is_remediation == is_rem_template:
-            matching_templates.append(t)
-
-    if not matching_templates:
-        if allow_fallback and is_remediation:
-            # Fallback: Try to find a standard template if remediation is missing
-            # This prevents hard blocks if a specific remediation variant isn't ready
-            for t in candidates:
-                if not t.task_template_id.endswith("__remediation"):
-                    matching_templates.append(t)
+    
+    if is_remediation:
+        # Load curriculum to find the strategy for this step
+        curriculum = CurriculumService.get_curriculum(track_id)
+        slot_def = curriculum.get_slot_definition(slot.slot_id)
         
-        if not matching_templates:
-            type_str = "Remediation" if is_remediation else "Standard"
+        if not slot_def or not slot_def.remediation:
+            raise TemplateResolutionError(f"No remediation plan defined for slot {slot.slot_id}")
+            
+        plan = slot_def.remediation.strategies
+        step = slot.current_remediation_step
+        
+        if step >= len(plan):
+            raise TemplateResolutionError(f"Remediation strategy exhausted for {slot.slot_id} at step {step}")
+            
+        required_strategy = plan[step]
+        
+        matches = [
+            t for t in candidates
+            if t.variant == "remediation" and t.strategy == required_strategy
+        ]
+        
+        if not matches:
+            # Fallback: if specific remediation variant not found, try standard
+            matches = [t for t in candidates if t.variant in (None, "standard")]
+
+        if not matches:
             raise TemplateResolutionError(
-                f"{type_str} template not found for: {base_template_id}"
+                f"No suitable template found for "
+                f"{slot.slot_id} with strategy {required_strategy}."
             )
+            
+        return matches[0].task_template_id
 
-    # Sort by ID to get the latest version (e.g. v2 > v1)
-    # This assumes standard naming conventions
-    best_match = sorted(matching_templates, key=lambda x: x.task_template_id)[-1]
+    # Normal path (standard task)
+    matches = [
+        t for t in candidates
+        if t.variant in (None, "standard")
+    ]
+    
+    if not matches:
+        raise TemplateResolutionError(
+            f"No standard templates found for {slot.slot_id}."
+        )
 
-    return best_match.task_template_id
+    # In V2, we might want to pick a random one or one the user hasn't seen
+    return matches[0].task_template_id
 
 
 

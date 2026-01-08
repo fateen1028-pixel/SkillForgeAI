@@ -35,7 +35,9 @@ export function AuthProvider({ children }) {
     setError(null);
     try {
       const data = await authService.login(email, password);
-      setUser(data.user);
+      localStorage.setItem('was_logged_in', 'true');
+      const userData = await authService.getCurrentUser();
+      setUser(userData);
       return data;
     } catch (err) {
       setError(err.message);
@@ -49,9 +51,11 @@ export function AuthProvider({ children }) {
     setLoading(true);
     setError(null);
     try {
-      const data = await authService.register(name, email, password);
-      setUser(data.user);
-      return data;
+      await authService.register(name, email, password);
+      localStorage.setItem('was_logged_in', 'true');
+      const userData = await authService.getCurrentUser();
+      setUser(userData);
+      return userData;
     } catch (err) {
       setError(err.message);
       throw err;
@@ -63,12 +67,24 @@ export function AuthProvider({ children }) {
   const logout = useCallback(async () => {
     try {
       await authService.logout();
+      localStorage.removeItem('was_logged_in');
       setUser(null);
       router.push('/auth/login');
     } catch (err) {
       console.error('Logout failed', err);
     }
   }, [router]);
+
+  const refreshUser = useCallback(async () => {
+    try {
+      const userData = await authService.getCurrentUser();
+      setUser(userData);
+      return userData;
+    } catch (err) {
+      console.error('Failed to refresh user', err);
+      setUser(null);
+    }
+  }, []);
 
   const value = {
     user,
@@ -77,6 +93,7 @@ export function AuthProvider({ children }) {
     login,
     register,
     logout,
+    refreshUser,
     isAuthenticated: !!user,
   };
 
