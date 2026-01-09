@@ -83,7 +83,12 @@ export default function RoadmapPage() {
   if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-[#030712] text-white flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-violet-500"></div>
+        <div className="relative">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="h-2 w-2 bg-emerald-500 rounded-full animate-pulse"></div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -101,48 +106,44 @@ export default function RoadmapPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#030712] text-white">
-      <div className="container-app py-6 md:py-10 max-w-5xl mx-auto px-4">
-        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6 mb-8">
-          <div className="flex items-center gap-4">
-            <Link href="/dashboard" className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
-              <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </Link>
-            <div>
-              <h1 className="text-2xl font-bold">Roadmap</h1>
-              {roadmapState?.goal && (
-                <div className="flex items-center gap-2 mt-2">
-                  <span className="px-3 py-1 text-xs font-medium text-violet-300 bg-violet-500/10 border border-violet-500/20 rounded-full">
-                    Goal: {roadmapState.goal}
+    <div className="min-h-screen bg-[#030712] text-white selection:bg-emerald-500/30">
+      {/* Background Ambience */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <div className="absolute top-[-10%] right-[-5%] w-125 h-125 bg-emerald-600/5 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-10%] left-[-10%] w-150 h-150 bg-blue-600/5 rounded-full blur-[120px]" />
+      </div>
+
+      <div className="relative z-10 max-w-7xl mx-auto p-6 md:p-10 space-y-12">
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/5 pb-8">
+          <div className="space-y-2">
+            <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
+              <span className="bg-linear-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
+                Skill Roadmap
+              </span>
+            </h1>
+            <p className="text-slate-400 max-w-lg text-lg">
+              A structured path to master {roadmapState?.goal || 'your skills'} with precision.
+            </p>
+          </div>
+          
+          <div className="flex gap-4">
+             {typeof roadmapState?.confidenceThreshold === 'number' && (
+                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-4 flex flex-col gap-1 min-w-35">
+                  <span className="text-xs text-slate-400 uppercase tracking-wider font-semibold">Threshold</span>
+                  <span className="text-2xl font-bold font-mono text-emerald-400">
+                    {Math.round(roadmapState.confidenceThreshold * 100)}%
                   </span>
                 </div>
-              )}
-            </div>
+             )}
+             <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-4 flex flex-col gap-1 min-w-35">
+                <span className="text-xs text-slate-400 uppercase tracking-wider font-semibold">Total Phases</span>
+                <span className="text-2xl font-bold font-mono">{roadmapState?.phases?.length || 0}</span>
+             </div>
           </div>
-
-          {typeof roadmapState?.confidenceThreshold === 'number' && (
-             <div className="bg-slate-900/50 border border-slate-800 p-4 rounded-xl min-w-70 backdrop-blur-sm self-start">
-              <div className="flex justify-between items-end mb-2">
-                <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">Confidence</span>
-                <span className="text-lg font-bold text-white">
-                  {Math.round(roadmapState.confidenceThreshold * 100)}<span className="text-sm text-slate-500">%</span>
-                </span>
-              </div>
-              <div className="h-2 bg-slate-800 rounded-full overflow-hidden border border-white/5">
-                <div 
-                  className="h-full bg-linear-to-r from-violet-600 via-fuchsia-500 to-indigo-400 shadow-[0_0_10px_rgba(139,92,246,0.3)] transition-all duration-1000 ease-out"
-                  style={{ width: `${Math.min(roadmapState.confidenceThreshold * 100, 100)}%` }}
-                />
-              </div>
-            </div>
-          )}
         </div>
 
-        <div className="bg-white/5 border border-white/10 rounded-xl p-6">
-          <RoadmapTab roadmapState={roadmapState} />
-        </div>
+        <RoadmapTab roadmapState={roadmapState} />
       </div>
     </div>
   );

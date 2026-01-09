@@ -17,6 +17,7 @@ def generate_v1_roadmap(user_id: str, goal: str) -> RoadmapState:
                 slot_id=slot_def.id,
                 skill=slot_def.skill,
                 difficulty=slot_def.difficulty,
+                question_type=slot_def.question_type,
                 status="locked"
             ))
         

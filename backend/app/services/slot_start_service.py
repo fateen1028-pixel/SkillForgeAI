@@ -30,15 +30,17 @@ def start_slot(
     task_instance = TaskInstance(
         skill=task_template.skill,
         slot_id=slot_id,
-        base_template_id=task_template.base_template_id,
+        base_template_id=task_template.base_template_id or task_template.task_template_id,
         task_template_id=task_template.task_template_id,
         difficulty=task_template.difficulty,
+        type=task_template.question_type,
         status=TaskStatus.IN_PROGRESS,
         started_at=datetime.now(timezone.utc)
     )
     
     # 5️⃣ Update Slot
     slot.status = "in_progress"
+    slot.question_type = task_template.question_type
     slot.active_task_instance_id = task_instance.task_instance_id
     roadmap.task_instances.append(task_instance)
     

@@ -50,8 +50,31 @@ slots:
         variant: remediation
         strategy: explanation
         prompt: |
-          Re-explain how arrays are stored in memory and why arr[i] is O(1).
-          Include the address formula and one numeric example.
+          Rebuild the memory model of arrays.
+          Explain contiguous storage, derive the address formula,
+          and show one numeric example.
+
+      - id: arrays_s1_mcq_memory
+        type: mcq
+        difficulty: easy
+        prompt: "Which statement correctly describes how arrays are stored in memory?"
+        options:
+          - "Each element stores the address of the next element"
+          - "Elements are placed randomly and tracked by an index table"
+          - "Elements are stored in contiguous memory locations"
+          - "Each access requires scanning from the first element"
+        correct_answer: 2
+        concepts: [memory_model, contiguous_allocation]
+
+      - id: arrays_s1_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: easy
+        prompt: |
+          Remember that arrays are like a single block of lockers.
+          If you know where locker 0 is, you can jump straight to locker 10
+          because they are right next to each other.
+        concepts: [memory_model]
 
 # =========================================================
 # SLOT 2 — ITERATION & ACCUMULATION
@@ -99,6 +122,37 @@ slots:
         rubric: "Must show step-by-step state update."
         concepts: [loop_trace, accumulation]
 
+      - id: arrays_s2_remediation_bounds
+        base_id: arrays_s2_sum
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Explain how loop bounds work in arrays.
+          Trace indices and values for [5,6,7].
+          Show what breaks if i <= len(arr).
+
+      - id: arrays_s2_mcq_bounds
+        type: mcq
+        difficulty: easy
+        prompt: "In a zero-indexed array of length N, what are the valid indices?"
+        options:
+          - "1 to N"
+          - "0 to N"
+          - "0 to N-1"
+          - "1 to N-1"
+        correct_answer: 2
+        concepts: [iteration, indexing]
+
+      - id: arrays_s2_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: easy
+        prompt: |
+          Computers start counting at 0. If you have 5 items, they are at 0, 1, 2, 3, and 4.
+          The 'length' (5) is never a valid index for the last item.
+        concepts: [indexing]
+
 # =========================================================
 # SLOT 3 — SUBARRAY & RANGE THINKING
 # =========================================================
@@ -134,6 +188,38 @@ slots:
           def solve(arr, k):
               pass
         concepts: [nested_loops, subarray]
+
+      - id: arrays_s3_remediation_ranges
+        base_id: arrays_s3_list_subarrays
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Rebuild the idea of a subarray.
+          Define what contiguous means.
+          List all subarrays of [2,5] using index pairs.
+
+      - id: arrays_s3_mcq_subarray
+        type: mcq
+        difficulty: easy
+        prompt: "Which of the following is NOT a subarray of [10, 20, 30, 40]?"
+        options:
+          - "[10, 20]"
+          - "[20, 30, 40]"
+          - "[10, 30]"
+          - "[30]"
+        correct_answer: 2
+        concepts: [subarray, contiguous_ranges]
+
+      - id: arrays_s3_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: easy
+        prompt: |
+          A subarray MUST be a continuous slice of the original array.
+          If you skip an element (like going from 10 to 30 while skipping 20),
+          it's a subsequence, not a subarray.
+        concepts: [subarray]
 
 # =========================================================
 # SLOT 4 — SHIFTING & STRUCTURAL COST
@@ -173,6 +259,37 @@ slots:
           def solve(arr, i, x):
               pass
         concepts: [shifting, boundaries]
+
+      - id: arrays_s4_remediation_physical_model
+        base_id: arrays_s4_shift_count
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Visualize the array as boxes in memory.
+          Show what happens when inserting at the front.
+          Count exactly which elements move.
+
+      - id: arrays_s4_mcq_shifting
+        type: mcq
+        difficulty: medium
+        prompt: "If you insert an element at index 0 of an array with N elements, how many existing elements must be shifted?"
+        options:
+          - "0"
+          - "1"
+          - "N-1"
+          - "N"
+        correct_answer: 3
+        concepts: [shifting, insertion_cost]
+
+      - id: arrays_s4_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: easy
+        prompt: |
+          To make room at the very beginning (index 0), every single existing element
+          must move one spot to the right. If there are N elements, N shifts occur.
+        concepts: [shifting]
 
 # =========================================================
 # SLOT 5 — COST AWARENESS BY POSITION
@@ -216,6 +333,37 @@ slots:
                   pass
         concepts: [append_pop, cost_awareness]
 
+      - id: arrays_s5_remediation_cost
+        base_id: arrays_s5_cost_analysis
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Compare inserting at index 0, middle, and end.
+          Explain which elements move and why cost changes.
+
+      - id: arrays_s5_mcq_cost
+        type: mcq
+        difficulty: medium
+        prompt: "Which array operation is generally O(1) in time complexity?"
+        options:
+          - "Inserting at a random index"
+          - "Deleting from the front"
+          - "Appending to the end"
+          - "Searching for a value"
+        correct_answer: 2
+        concepts: [complexity, cost_awareness]
+
+      - id: arrays_s5_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: easy
+        prompt: |
+          Appending to the end doesn't require moving any other elements (assuming
+          there is capacity), so it's a constant time operation. Deleting or 
+          inserting elsewhere requires shifts.
+        concepts: [appends, complexity]
+
 # =========================================================
 # SLOT 6 — RANDOM ACCESS VS SEARCH
 # =========================================================
@@ -250,6 +398,37 @@ slots:
           Why does a sorted array improve search but worsen insertion?
         rubric: "Must reference binary search and shifting cost."
         concepts: [tradeoffs, invariants]
+
+      - id: arrays_s6_remediation_trace
+        base_id: arrays_s6_binary_search
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Trace binary search step by step.
+          Show low, mid, high.
+          State the invariant at each step.
+
+      - id: arrays_s6_mcq_search_cost
+        type: mcq
+        difficulty: medium
+        prompt: "In an unsorted array of size N, what is the worst-case time complexity to find if a specific value exists?"
+        options:
+          - "O(1)"
+          - "O(log N)"
+          - "O(N)"
+          - "O(N log N)"
+        correct_answer: 2
+        concepts: [search_complexity, unsorted_arrays]
+
+      - id: arrays_s6_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: easy
+        prompt: |
+          If the data isn't sorted, you might have to check every single element
+          one by one to find your target. This leads to linear time complexity, O(N).
+        concepts: [linear_search]
 
 # =========================================================
 # SLOT 7 — BOUNDARY LITERACY & CAPACITY THINKING
@@ -293,6 +472,37 @@ slots:
                   pass
         concepts: [circular_array, capacity_model]
 
+      - id: arrays_s7_remediation_edges
+        base_id: arrays_s7_safe_access
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Explain index boundaries using examples.
+          Show empty, full, and single-element arrays.
+          Demonstrate one off-by-one failure.
+
+      - id: arrays_s7_mcq_bounds_check
+        type: mcq
+        difficulty: easy
+        prompt: "Which check correctly prevents an 'Index Out of Bounds' error for index 'i' in array 'arr'?"
+        options:
+          - "if i <= len(arr):"
+          - "if i < len(arr):"
+          - "if i > 0:"
+          - "if i < capacity:"
+        correct_answer: 1
+        concepts: [bounds_checking, indexing]
+
+      - id: arrays_s7_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: easy
+        prompt: |
+          The last valid index is always length - 1. Therefore, the index 'i' 
+          must be strictly less than the length to be valid.
+        concepts: [off_by_one]
+
 # =========================================================
 # SLOT 8 — SUBARRAY OPTIMIZATION (ADVANCED)
 # =========================================================
@@ -327,3 +537,273 @@ slots:
           Explain why Kadane’s algorithm works using prefix reasoning.
         rubric: "Must reference local vs global optimal states."
         concepts: [mental_model, optimization]
+
+      - id: arrays_s8_remediation_prefix
+        base_id: arrays_s8_kadane
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Define “best subarray ending at i”.
+          Derive the transition without formulas.
+          Explain why negative prefixes are discarded.
+
+      - id: arrays_s8_mcq_optimization
+        type: mcq
+        difficulty: hard
+        prompt: "In Kadane's algorithm, what do we do if the current subarray sum becomes negative?"
+        options:
+          - "Keep it and continue adding"
+          - "Reset it to zero to start a new potential subarray"
+          - "Stop the algorithm and return current max"
+          - "Multiply it by -1"
+        correct_answer: 1
+        concepts: [prefix_state, optimization]
+
+      - id: arrays_s8_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: medium
+        prompt: |
+          A negative prefix sum will only decrease the total of any future
+          elements we add to it. To find the maximum sum, it's always better
+          to start fresh (sum = 0) than to carry a negative burden.
+        concepts: [prefix_sum]
+
+# =========================================================
+# SLOT 9 — PARTITIONING & TWO-POINTERS
+# =========================================================
+
+  - slot_id: ARRAY_SLOT_9_PARTITIONING
+    mental_install: "Partitioning reorganizes an array into distinct regions in a single pass using multiple pointers."
+    invariant: "Three pointers divide the array into categorized regions (e.g., [0..i-1], [i..j], [k..n])."
+    mastery_signals:
+      - Implements Dutch National Flag algorithm
+      - Reorganizes data in O(n) time and O(1) space
+      - Handles boundary pointer crossings
+    hard_failures:
+      - Uses O(n) extra space
+      - Swaps incorrectly, causing infinite loops
+      - Requires more than one pass
+
+    templates:
+      - id: arrays_s9_sort_colors
+        type: coding
+        difficulty: medium
+        prompt: "Given an array with n objects colored red, white, or blue (0, 1, 2), sort them in-place."
+        language: python
+        starter_code: |
+          def sortColors(nums):
+              pass
+        concepts: [partitioning, two_pointers, in_place]
+
+      - id: arrays_s9_remediation_partition
+        base_id: arrays_s9_sort_colors
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Visualize the three regions. 
+          Explain why 'mid' is the worker pointer and what happens when it 
+          swaps with 'low' vs 'high'.
+        concepts: [pointer_logic]
+
+      - id: arrays_s9_mcq_partition_complexity
+        type: mcq
+        difficulty: medium
+        prompt: "What is the space complexity of the Dutch National Flag algorithm to sort three categories?"
+        options:
+          - "O(1)"
+          - "O(log N)"
+          - "O(N)"
+          - "O(N^2)"
+        correct_answer: 0
+        concepts: [space_complexity, in_place]
+
+      - id: arrays_s9_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: easy
+        prompt: |
+          Because we only use a few pointers (low, mid, high) to swap elements 
+          within the existing array, we don't need any new arrays. 
+          This is called 'In-Place' and uses constant (O(1)) space.
+        concepts: [memory_optimization]
+
+# =========================================================
+# SLOT 10 — INTERVALS & SORTING INVARIANTS
+# =========================================================
+
+  - slot_id: ARRAY_SLOT_10_INTERVALS
+    mental_install: "Intervals are range-based subarrays that can be merged if they overlap."
+    invariant: "If cur_interval.start <= prev_interval.end, they must be merged."
+    mastery_signals:
+      - Sorts by start time before processing
+      - Correctly calculates merged range boundaries
+      - Handles non-overlapping jumps
+    hard_failures:
+      - Attempts to merge without sorting first
+      - Incorrectly calculates end bound (uses cur.end instead of max(prev.end, cur.end))
+      - Loses interval data during merging
+
+    templates:
+      - id: arrays_s10_merge_intervals
+        type: coding
+        difficulty: medium
+        prompt: "Merge all overlapping intervals in a list."
+        language: python
+        starter_code: |
+          def merge(intervals):
+              pass
+        concepts: [intervals, sorting, range_logic]
+
+      - id: arrays_s10_remediation_merge
+        base_id: arrays_s10_merge_intervals
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Draw two overlapping intervals [1, 5] and [2, 6]. 
+          Show why the new interval is [1, 6]. 
+          Explain why sorting by 'start' makes the logic possible in one pass.
+        concepts: [overlap_detection]
+
+      - id: arrays_s10_mcq_interval_sort
+        type: mcq
+        difficulty: medium
+        prompt: "Why is it usually necessary to sort intervals by their start time before merging?"
+        options:
+          - "To reduce time complexity to O(1)"
+          - "To ensure that overlapping intervals are adjacent in the list"
+          - "Because intervals cannot be merged otherwise"
+          - "To change the space complexity"
+        correct_answer: 1
+        concepts: [sorting_invariants]
+
+      - id: arrays_s10_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: medium
+        prompt: |
+          If we don't sort, intervals that overlap could be at opposite ends of 
+          the list. Sorting brings potentially overlapping ranges right next 
+          to each other, allowing us to merge them in a single scan.
+        concepts: [spatial_locality]
+
+# =========================================================
+# SLOT 11 — 2D ARRAYS (MATRICES)
+# =========================================================
+
+  - slot_id: ARRAY_SLOT_11_MATRICES
+    mental_install: "2D arrays map 2D coordinates (row, col) to 1D memory layout."
+    invariant: "A coordinate (r, c) in a matrix with C columns is at index r * C + c in memory."
+    mastery_signals:
+      - Correctly maps row/column indices
+      - Implements non-standard traversals (spiral, diagonal)
+      - Transposes or rotates in-place
+    hard_failures:
+      - Swaps row and column indices (r[c] vs c[r])
+      - Out-of-bounds on row/column boundaries
+      - Inefficiently copies the matrix when in-place is possible
+
+    templates:
+      - id: arrays_s11_spiral_matrix
+        type: coding
+        difficulty: hard
+        prompt: "Return all elements of an m x n matrix in spiral order."
+        language: python
+        starter_code: |
+          def spiralOrder(matrix):
+              pass
+        concepts: [matrix_traversal, boundary_control]
+
+      - id: arrays_s11_remediation_matrix
+        base_id: arrays_s11_spiral_matrix
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Explain the 'Four Boundary' model. 
+          How do top, bottom, left, and right pointers narrow down the search space?
+        concepts: [coordinate_mapping]
+
+      - id: arrays_s11_mcq_matrix_index
+        type: mcq
+        difficulty: easy
+        prompt: "In a 2D matrix 'arr', what does `arr[2][3]` typically represent?"
+        options:
+          - "Row 3, Column 2"
+          - "Row 2, Column 3"
+          - "The sum of 2 and 3"
+          - "A subarray of length 6"
+        correct_answer: 1
+        concepts: [indexing, syntax]
+
+      - id: arrays_s11_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: easy
+        prompt: |
+          In the notation `matrix[r][c]`, the first index selects the nested 
+          list (the row), and the second index selects the item within that 
+          list (the column).
+        concepts: [nested_traversal]
+
+# =========================================================
+# SLOT 12 — ROTATION INVARIANTS
+# =========================================================
+
+  - slot_id: ARRAY_SLOT_12_ROTATION
+    mental_install: "Rotated sorted arrays maintain sorted properties in segments."
+    invariant: "At any split point in a rotated sorted array, at least one half is always sorted."
+    mastery_signals:
+      - Identifies sorted halves in binary search
+      - Finds the pivot/inflection point in O(log n)
+      - Adapts binary search targets based on segments
+    hard_failures:
+      - Uses standard binary search without rotation logic
+      - Reverts to linear search O(n)
+      - Fails on arrays with duplicates
+
+    templates:
+      - id: arrays_s12_rotated_search
+        type: coding
+        difficulty: hard
+        prompt: "Find the index of a target in a rotated sorted array."
+        language: python
+        starter_code: |
+          def search(nums, target):
+              pass
+        concepts: [binary_search, rotation, invariants]
+
+      - id: arrays_s12_remediation_rotation
+        base_id: arrays_s12_rotated_search
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Explain the 'One Sorted Half' rule. 
+          Why can we always discard half of a rotated array even if it's not fully sorted?
+        concepts: [logarithmic_logic]
+
+      - id: arrays_s12_mcq_rotation_property
+        type: mcq
+        difficulty: hard
+        prompt: "What is the key property we use to binary search in a rotated sorted array?"
+        options:
+          - "The whole array is still sorted"
+          - "At least one half (left or right) of the search space is always sorted"
+          - "The target is always in the smaller half"
+          - "The middle element is always the pivot"
+        correct_answer: 1
+        concepts: [invariants, search_logic]
+
+      - id: arrays_s12_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: medium
+        prompt: |
+          Even if an array is rotated, like [4, 5, 6, 7, 0, 1, 2], picking any 
+          middle element will always leave either the left side or the right 
+          side perfectly ordered. We search the ordered side first!
+        concepts: [partitioned_search]

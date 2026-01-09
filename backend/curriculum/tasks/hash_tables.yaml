@@ -29,6 +29,38 @@ slots:
         rubric: "Must reference pigeonhole principle and mapping."
         concepts: [hashing, mapping]
 
+      - id: hash_s1_remediation
+        base_id: hash_s1_explain
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Review the 'Pigeonhole Principle' in the context of hashing. 
+          Explain why mapping a large set of keys to a smaller set of indices MUST result in collisions.
+          Show a simple $key \pmod{size}$ example.
+
+      - id: hash_s1_mcq_mapping
+        type: mcq
+        difficulty: easy
+        prompt: "If multiple keys map to the same index in a hash table, what is this event called?"
+        options:
+          - "Hash Fragmentation"
+          - "A Collision"
+          - "Overloading"
+          - "A Pigeonhole Error"
+        correct_answer: 1
+        concepts: [collisions, hashing]
+
+      - id: hash_s1_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: easy
+        prompt: |
+          A collision happens when different keys produce the same hash index. 
+          Since the number of possible keys is almost always larger than the 
+          number of slots, collisions are statistically inevitable.
+        concepts: [mapping]
+
 # =========================================================
 # SLOT 2 — COLLISION MANAGEMENT
 # =========================================================
@@ -54,6 +86,37 @@ slots:
               pass
         concepts: [hashing, constant_lookup]
 
+      - id: hash_s2_remediation
+        base_id: hash_s2_two_sum
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Explain why storing 'complements' in a hash map turns an $O(n^2)$ search into $O(n)$. 
+          Trace [2, 7, 11] with target 9.
+
+      - id: hash_s2_mcq_lookup
+        type: mcq
+        difficulty: easy
+        prompt: "What is the expected time complexity for looking up a key in a well-designed hash table?"
+        options:
+          - "O(1)"
+          - "O(N)"
+          - "O(log N)"
+          - "O(N^2)"
+        correct_answer: 0
+        concepts: [complexity, constant_time]
+
+      - id: hash_s2_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: easy
+        prompt: |
+          By directly calculating the address (index) from the key, a hash table 
+          allows us to jump straight to the data without scanning, providing 
+          constant time access.
+        concepts: [lookup_speed]
+
 # =========================================================
 # SLOT 3 — FREQUENCY & INDEXING POWER
 # =========================================================
@@ -78,3 +141,535 @@ slots:
           def solve(s):
               pass
         concepts: [frequency_map, indexing]
+
+      - id: hash_s3_remediation
+        base_id: hash_s3_frequency
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Explain the 'Frequency Map' pattern. 
+          Show how to use a hash table to store counts of elements to avoid repeated scanning.
+
+      - id: hash_s3_mcq_frequency
+        type: mcq
+        difficulty: easy
+        prompt: "Why is a hash map better than an array for counting frequencies of arbitrary words?"
+        options:
+          - "Arrays cannot store numbers"
+          - "A hash map doesn't require knowing the size of the vocabulary in advance"
+          - "Hash maps are smaller than arrays"
+          - "Arrays are for sorted data only"
+        correct_answer: 1
+        concepts: [frequency_counting, flexibility]
+
+      - id: hash_s3_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: easy
+        prompt: |
+          Arrays require integer indices and a fixed size. A hash map can handle 
+          any object (like a word) as a key and grows as needed to accommodate 
+          new unique items.
+        concepts: [dynamic_growth]
+
+# =========================================================
+# SLOT 4 — RESOLUTION MECHANICS
+# =========================================================
+
+  - slot_id: HASH_SLOT_4_RESOLUTION
+    mental_install: "Hash functions determine distribution; resolution determines reliability."
+    invariant: "Chaining uses indirection (lists); Probing uses shifts (offset math)."
+    mastery_signals:
+      - Compares memory layout of chaining vs probing
+      - Explains 'clustering' in linear probing
+    hard_failures:
+      - Ignores cache locality differences
+
+    templates:
+      - id: hash_s4_chaining_vs_probing
+        type: explanation
+        difficulty: medium
+        prompt: |
+          Compare Chaining and Linear Probing. Which one is better when memory is tight, and why?
+        rubric: "Must mention pointer overhead and cache locality."
+        concepts: [probing, chaining, memory]
+
+      - id: hash_s4_remediation
+        base_id: hash_s4_chaining_vs_probing
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Visualize 'Linear Probing'. 
+          Show what happens when three keys hash to the same index. 
+          Explain why 'clustering' slows down lookup.
+
+      - id: hash_s4_mcq_chaining
+        type: mcq
+        difficulty: medium
+        prompt: "In collision resolution by 'Chaining', what is stored at each index of the hash table?"
+        options:
+          - "The value itself"
+          - "A pointer to a linked list (or other structure) of all items that hashed to that index"
+          - "The hash code"
+          - "A second hash table"
+        correct_answer: 1
+        concepts: [chaining, data_structures]
+
+      - id: hash_s4_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: easy
+        prompt: |
+          Chaining handles collisions by putting all 'colliding' items into a 
+          separate list attached to that index. We follow the list to find our 
+          specific key.
+        concepts: [indirection]
+
+# =========================================================
+# SLOT 5 — THE LOAD FACTOR INVARIANT
+# =========================================================
+
+  - slot_id: HASH_SLOT_5_DYNAMIC_RESIZING
+    mental_install: "Hash performance $O(1)$ depends on keeping the table sparse."
+    invariant: 'Load Factor ($\alpha = n/m$) must remain below a threshold to prevent $O(n)$ drift.'
+    mastery_signals:
+      - Explains 'amortized' constant time
+      - Identifies trigger for rehashing
+    hard_failures:
+      - Thinks capacity is fixed
+      - Forgets that indices change during resize
+
+    templates:
+      - id: hash_s5_resizing_logic
+        type: explanation
+        difficulty: hard
+        prompt: |
+          Explain why we double the hash table and re-insert all elements when the load factor is exceeded. 
+          Why can't we just use the old indices?
+        rubric: 'Must reference index calculation dependency on table size ($hash(k) \pmod m$).'
+        concepts: [load_factor, rehashing, amortized_analysis]
+
+      - id: hash_s5_remediation
+        base_id: hash_s5_resizing_logic
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Derive why $hash(k) \pmod{10}$ is different from $hash(k) \pmod{20}$. 
+          Explain why 'Rehashing' is necessary to keep keys findable in a larger table.
+
+      - id: hash_s5_mcq_resize
+        type: mcq
+        difficulty: medium
+        prompt: "Why must we re-calculate the index (rehash) for all elements when a hash table is resized?"
+        options:
+          - "To clear the memory"
+          - "Because the index depends on the table size (key % size), which has changed"
+          - "To change the values of the keys"
+          - "To sort the elements"
+        correct_answer: 1
+        concepts: [rehashing, load_factor]
+
+      - id: hash_s5_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: medium
+        prompt: |
+          If your address formula is `key % current_size`, changing the `size` 
+          means the same `key` now points to a completely different address. 
+          We must move every element to its new home.
+        concepts: [mapping_dependency]
+
+# =========================================================
+# SLOT 6 — CANONICAL REPRESENTATION
+# =========================================================
+
+  - slot_id: HASH_SLOT_6_GROUPING
+    mental_install: "Complex objects can be indexed by transforming them into a stable key."
+    invariant: "Equivalent objects must generate the same key."
+    mastery_signals:
+      - Transforms structure into canonical key (e.g., sorted string or frequency tuple)
+      - Groups values into lists
+    hard_failures:
+      - Uses non-hashable keys
+      - Keys aren't stable across mutations
+
+    templates:
+      - id: hash_s6_group_anagrams
+        type: coding
+        difficulty: medium
+        prompt: "Group a list of strings into anagram sets."
+        language: python
+        starter_code: |
+          def groupAnagrams(strs):
+              pass
+        concepts: [canonical_keys, grouping]
+
+      - id: hash_s6_remediation
+        base_id: hash_s6_group_anagrams
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Explain the 'Canonical Key' concept. 
+          Why does sorting a string (e.g., 'eat' -> 'aet') create a perfect key for grouping anagrams?
+
+      - id: hash_s6_mcq_canonical
+        type: mcq
+        difficulty: medium
+        prompt: "What is a 'canonical key' in the context of grouping anagrams?"
+        options:
+          - "The first string in the group"
+          - "A standardized representation (like sorted characters) shared by all members of the group"
+          - "A random number"
+          - "The length of the string"
+        correct_answer: 1
+        concepts: [canonical_keys, grouping]
+
+      - id: hash_s6_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: easy
+        prompt: |
+          To group similar things, they need a 'common name'. By sorting the 
+          letters, 'eat', 'tea', and 'ate' all get the same name: 'aet'.
+        concepts: [normalization]
+
+# =========================================================
+# SLOT 7 — PREFIX SUM OPTIMIZATION
+# =========================================================
+
+  - slot_id: HASH_SLOT_7_PREFIX_SUM
+    mental_install: "Hash maps can turn range queries into existence checks."
+    invariant: "Subarray sum $[i..j]$ is $PrefixSum[j] - PrefixSum[i-1]$."
+    mastery_signals:
+      - Maps running totals to frequencies
+      - Finds target sums in linear time
+    hard_failures:
+      - Uses nested $O(n^2)$ loops
+      - Misses the $i-1$ offset logic
+
+    templates:
+      - id: hash_s7_subarray_sum
+        type: coding
+        difficulty: hard
+        prompt: "Find the total number of subarrays whose sum equals $k$."
+        language: python
+        starter_code: |
+          def subarraySum(nums, k):
+              pass
+        concepts: [prefix_sum, math_mapping]
+
+      - id: hash_s7_remediation
+        base_id: hash_s7_subarray_sum
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Explain the equation: $CurrentSum - TargetSum = OldPrefixSum$. 
+          Show how the hash map allows us to 'look back' in time to find old prefixes that complete the target.
+
+      - id: hash_s7_mcq_prefix_hash
+        type: mcq
+        difficulty: hard
+        prompt: "Why do we initialize our hash map with {0: 1} when solving the 'Subarray Sum Equals K' problem?"
+        options:
+          - "To handle the case where a prefix sum exactly equals K"
+          - "To count the number of elements in the array"
+          - "To prevent a division by zero error"
+          - "It is a standard placeholder"
+        correct_answer: 0
+        concepts: [prefix_sum, boundary_cases]
+
+      - id: hash_s7_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: medium
+        prompt: |
+          If a subarray starting from the very first element (index 0) sums to K, 
+          then `CurrentSum - K = 0`. We need the map to know that a prefix of 
+          sum 0 existed (before we started).
+        concepts: [zero_prefix]
+
+# =========================================================
+# SLOT 8 — SET THEORY & EXISTENCE
+# =========================================================
+
+  - slot_id: HASH_SLOT_8_INTERSECTION
+    mental_install: "Sets capitalize on the 'Existence is O(1)' promise."
+    invariant: "Elements are unique and retrievable without scanning."
+    mastery_signals:
+      - Effectively uses sets for deduplication
+      - Intersects streams in linear time
+    hard_failures:
+      - Rescans the result array repeatedly
+
+    templates:
+      - id: hash_s8_intersection
+        type: coding
+        difficulty: easy
+        prompt: "Compute the intersection of two arrays (unique elements)."
+        language: python
+        starter_code: |
+          def intersection(nums1, nums2):
+              pass
+        concepts: [set_operations, existence]
+
+      - id: hash_s8_remediation
+        base_id: hash_s8_intersection
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Compare searching in a List (O(N)) vs searching in a Set (O(1)). 
+          Explain why sets are the ideal tool for intersection.
+
+      - id: hash_s8_mcq_existence
+        type: mcq
+        difficulty: easy
+        prompt: "If you have two arrays of size N, what is the best time complexity for finding their intersection using a Set?"
+        options:
+          - "$O(N^2)$"
+          - '$O(N \log N)$'
+          - "$O(N)$"
+          - "$O(1)$"
+        correct_answer: 2
+        concepts: [set_operations, complexity]
+
+      - id: hash_s8_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: easy
+        prompt: |
+          By putting the first array into a Set (O(N)), we can check every element 
+          of the second array in O(1) time each. Total work is linear!
+        concepts: [time_complexity]
+
+# =========================================================
+# SLOT 9 — STRUCTURAL DESIGN
+# =========================================================
+
+  - slot_id: HASH_SLOT_9_DESIGN
+    mental_install: "Internalizing bucket math reveals how a high-level API works."
+    invariant: "A HashSet is a Hashmap where values are ignored or null."
+    mastery_signals:
+      - Implements basic hashing with modulo
+      - Handles collision within buckets
+    hard_failures:
+      - Fails to handle existing keys (idempotency)
+
+    templates:
+      - id: hash_s9_design_hashset
+        type: coding
+        difficulty: medium
+        prompt: "Design a HashSet without using built-in libraries."
+        language: python
+        starter_code: |
+          class MyHashSet:
+              def __init__(self): 
+                  self.size = 1000
+                  self.buckets = [[] for _ in range(self.size)]
+              
+              def add(self, key): pass
+              def remove(self, key): pass
+              def contains(self, key): pass
+        concepts: [implementation, buckets]
+
+      - id: hash_s9_remediation
+        base_id: hash_s9_design_hashset
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Review 'Bucketing'. 
+          Explain why an array of lists allows us to handle multiple keys hashing to the same spot without losing data.
+
+      - id: hash_s9_mcq_buckets
+        type: mcq
+        difficulty: medium
+        prompt: "In a manual HashSet implementation, why do we use `key % array_size`?"
+        options:
+          - "To simplify the number"
+          - "To map any integer key to a valid index within our fixed-size array"
+          - "To encrypt the data"
+          - "To make the keys alphabetical"
+        correct_answer: 1
+        concepts: [hashing_function]
+
+      - id: hash_s9_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: medium
+        prompt: |
+          The modulo operator (%) acts like a 'wrapping' function, ensuring 
+          no matter how big the key is, it 'lands' inside our array's capacity.
+        concepts: [modulo_math]
+
+# =========================================================
+# SLOT 10 — BIJECTION MAPPING
+# =========================================================
+
+  - slot_id: HASH_SLOT_10_BIJECTION
+    mental_install: "Two-way mappings ensure distinctness across domains."
+    invariant: '$A \rightarrow B$ AND $B \rightarrow A$ must both be consistent.'
+    mastery_signals:
+      - Uses dual maps or a set to track range values
+      - Identifies mapping violations early
+    hard_failures:
+      - Only checks mapping in one direction
+
+    templates:
+      - id: hash_s10_isomorphic
+        type: coding
+        difficulty: medium
+        prompt: "Determine if two strings are isomorphic."
+        language: python
+        starter_code: |
+          def isIsomorphic(s, t):
+              pass
+        concepts: [mappings, consistency]
+
+      - id: hash_s10_remediation
+        base_id: hash_s10_isomorphic
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Explain why a single map (A -> B) is not enough for isomorphism. 
+          Show why you need to ensure no two keys map to the same value (Surjection).
+
+      - id: hash_s10_mcq_bijective
+        type: mcq
+        difficulty: medium
+        prompt: "If string S is 'abc' and string T is 'ddd', why is this NOT isomorphic?"
+        options:
+          - "Because the strings have different lengths"
+          - "Because multiple characters in S ('a', 'b', 'c') are trying to map to the same character 'd' in T"
+          - "Because 'd' is not in the alphabet"
+          - "Because 'abc' is shorter than 'ddd'"
+        correct_answer: 1
+        concepts: [bijective_mapping]
+
+      - id: hash_s10_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: medium
+        prompt: |
+          Isomorphism requires a 1-to-1 relationship. If three different letters 
+          all point to 'd', we can't reliably go backwards from 'd' to a 
+          specific original letter.
+        concepts: [surjection]
+
+# =========================================================
+# SLOT 11 — COMPOUND DATA STRUCTURES
+# =========================================================
+
+  - slot_id: HASH_SLOT_11_LRU_CONCEPT
+    mental_install: "Advanced systems use Hash Tables + Doubly Linked Lists for O(1) mixed operations."
+    invariant: "Map provides O(1) access; List provides O(1) ordering/eviction."
+    mastery_signals:
+      - Explains how hashing enables fast pointer retrieval
+      - Describes update flow for 'Least Recently Used'
+    hard_failures:
+      - Thinks a map alone can track time order
+
+    templates:
+      - id: hash_s11_lru_model
+        type: explanation
+        difficulty: hard
+        prompt: |
+          How does combining a Hash Table and a Doubly Linked List enable an LRU Cache to perform 
+          get and put in constant time?
+        rubric: "Must explain the map storing node references for fast jumping in the list."
+        concepts: [lru, data_composition]
+
+      - id: hash_s11_remediation
+        base_id: hash_s11_lru_model
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Review the 'Mixed Model'. 
+          Explain how the Map provides $O(1)$ discovery and the List provides $O(1)$ re-ordering.
+
+      - id: hash_s11_mcq_lru_structure
+        type: mcq
+        difficulty: hard
+        prompt: "In an O(1) LRU implementation, what exactly does the Hash Map store as its 'Value'?"
+        options:
+          - "The actual data integer"
+          - "A pointer/reference to the node in the Doubly Linked List"
+          - "The timestamp of the last access"
+          - "The size of the cache"
+        correct_answer: 1
+        concepts: [data_composition, pointers]
+
+      - id: hash_s11_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: medium
+        prompt: |
+          The Map lets us 'teleport' directly to the specific node in the middle 
+          of the Linked List. Without the pointer, we'd have to search the list 
+          linearly (O(N)).
+        concepts: [optimization]
+
+# =========================================================
+# SLOT 12 — SELECTION OPTIMIZATION
+# =========================================================
+
+  - slot_id: HASH_SLOT_12_TOP_K_ELEMENTS
+    mental_install: "Hash tables facilitate frequency-based selection which can be optimized using buckets or heaps."
+    invariant: "Mapping frequencies to buckets allows selection of top elements in linear time O(N)."
+    mastery_signals:
+      - Solves 'Top K Frequent Elements' using Bucket Sort
+      - Explains why bucket sort is O(N) while heap approach is O(N log k)
+    hard_failures:
+      - Uses sorting (O(N log N)) when linear time is required
+      - Fails to handle cases where multiple elements have the same frequency
+
+    templates:
+      - id: hash_s12_top_k
+        type: coding
+        difficulty: hard
+        prompt: "Given an integer array nums and an integer k, return the k most frequent elements."
+        language: python
+        starter_code: |
+          def topKFrequent(nums, k):
+              pass
+        concepts: [frequency_maps, bucket_sort, optimization]
+
+      - id: hash_s12_remediation
+        type: explanation
+        variant: remediation
+        difficulty: hard
+        prompt: |
+          Think of 'Frequency Buckets'. 
+          1. Count the elements using a hash map.
+          2. Create an array of lists where the index represents the frequency.
+          3. Why does iterating this array backwards give us the top elements?
+        concepts: [bucket_logic]
+
+      - id: hash_s12_mcq_bucket_vs_heap
+        type: mcq
+        difficulty: hard
+        prompt: "When is Bucket Sort (using frequency) more efficient than a Heap for finding the Top K elements?"
+        options:
+          - "When the range of frequencies is small compared to N"
+          - "Always, because it is O(N) rather than O(N log K)"
+          - "When K is very large (close to N)"
+          - "It is never more efficient"
+        correct_answer: 1
+        concepts: [algorithm_selection, complexity]
+
+      - id: hash_s12_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: medium
+        prompt: |
+          Bucket sort based on frequency takes $O(N)$ because the maximum 
+          frequency is $N$. Sorting or using a heap $(O(N \log K))$ is 
+          slightly slower as $N$ grows.
+        concepts: [optimal_complexity]

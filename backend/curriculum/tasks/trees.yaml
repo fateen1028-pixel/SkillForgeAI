@@ -29,6 +29,36 @@ slots:
         rubric: "Must reference subtrees and hierarchical structure."
         concepts: [hierarchy, recursion]
 
+      - id: tree_s1_remediation
+        base_id: tree_s1_depth
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Re-visualize the tree structure. 
+          Explain why a 'node' is the root of its own subtree and how this leads to recursion.
+
+      - id: tree_s1_mcq_leaf
+        type: mcq
+        difficulty: easy
+        prompt: "What is the defining characteristic of a 'leaf' node in a tree?"
+        options:
+          - "It is the very first node (top)"
+          - "It has no children"
+          - "It has exactly two children"
+          - "It is the largest value in the tree"
+        correct_answer: 1
+        concepts: [tree_terminology]
+
+      - id: tree_s1_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: easy
+        prompt: |
+          Just like a real tree, the 'leaves' are at the very ends of the 
+          branches. They don't grow any further branches (children).
+        concepts: [hierarchy]
+
 # =========================================================
 # SLOT 2 — TRAVERSAL STATES
 # =========================================================
@@ -53,6 +83,37 @@ slots:
           def inorder(root):
               pass
         concepts: [dfs, traversal]
+
+      - id: tree_s2_remediation
+        base_id: tree_s2_traversal
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Trace the difference between Preorder, Inorder, and Postorder. 
+          Show exactly where the 'print(node.val)' happens in each.
+
+      - id: tree_s2_mcq_bst_order
+        type: mcq
+        difficulty: medium
+        prompt: "Which traversal of a Binary Search Tree (BST) visits the nodes in non-decreasing (sorted) order?"
+        options:
+          - "Preorder"
+          - "Inorder"
+          - "Postorder"
+          - "Level-order"
+        correct_answer: 1
+        concepts: [bst, traversal_properties]
+
+      - id: tree_s2_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: easy
+        prompt: |
+          In a BST, the left is smaller and the right is larger. 'Inorder' 
+          visits (Left, Root, Right), which perfectly follows the 
+          Smallest -> Middle -> Largest pattern.
+        concepts: [sorting]
 
 # =========================================================
 # SLOT 3 — STRUCTURAL COMPUTATION
@@ -79,6 +140,37 @@ slots:
               pass
         concepts: [recursion, aggregation]
 
+      - id: tree_s3_remediation
+        base_id: tree_s3_height
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Review how recursive properties aggregate. 
+          Explain why height(parent) = 1 + max(height(child1), height(child2)).
+
+      - id: tree_s3_mcq_height_base
+        type: mcq
+        difficulty: easy
+        prompt: "In the recursive formula `height = 1 + max(left_height, right_height)`, what should the function return when it reaches a `None` (Null) node?"
+        options:
+          - "0"
+          - "1"
+          - "-1 (if height is edges) or 0 (if height is nodes)"
+          - "Infinity"
+        correct_answer: 2
+        concepts: [recursion, boundary_cases]
+
+      - id: tree_s3_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: medium
+        prompt: |
+          The 'Base Case' must be neutral. If a leaf (height 0 or 1) is 
+          calculated from its children, those Null children must return 
+          a value that doesn't 'add' to the height incorrectly.
+        concepts: [base_case]
+
 # =========================================================
 # SLOT 4 — ORDERED TREES (BST)
 # =========================================================
@@ -103,3 +195,478 @@ slots:
           def isValidBST(root):
               pass
         concepts: [ordered_structure, invariants]
+
+      - id: tree_s4_remediation
+        base_id: tree_s4_validate
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Explain why checking only local children is not enough for BST validation. 
+          Define the range (min, max) that must be passed down.
+
+      - id: tree_s4_mcq_bst_range
+        type: mcq
+        difficulty: medium
+        prompt: "When validating a BST, what must stay true for all nodes in the right subtree of the root?"
+        options:
+          - "They must all be smaller than the root"
+          - "They must all be larger than the root"
+          - "They must be even numbers"
+          - "They must be leaves"
+        correct_answer: 1
+        concepts: [bst_invariants]
+
+      - id: tree_s4_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: medium
+        prompt: |
+          A BST isn't just about the immediate children. Every single node to 
+           the right of the root—no matter how deep—must be strictly 
+           greater than the root.
+        concepts: [transitive_property]
+
+# =========================================================
+# SLOT 5 — LEVEL-ORDER LOGIC (BFS)
+# =========================================================
+
+  - slot_id: TREE_SLOT_5_BFS
+    mental_install: "Trees can be processed layer-by-layer rather than branch-by-branch."
+    invariant: "Nodes at distance $k$ are processed before nodes at distance $k+1$."
+    mastery_signals:
+      - Implements queue-based traversal
+      - Groups nodes by depth
+    hard_failures:
+      - Uses recursive DFS when BFS is required
+      - Mismanages level boundaries
+
+    templates:
+      - id: tree_s5_levelorder
+        type: coding
+        difficulty: medium
+        prompt: "Return the level order traversal of a binary tree (list of lists)."
+        language: python
+        starter_code: |
+          def levelOrder(root):
+              pass
+        concepts: [bfs, queue, levels]
+
+      - id: tree_s5_remediation
+        base_id: tree_s5_levelorder
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Visualize the BFS queue. 
+          Explain why nodes are added to the tail and removed from the head to maintain level order.
+
+      - id: tree_s5_mcq_queue
+        type: mcq
+        difficulty: medium
+        prompt: "Which data structure is essential for implementing a non-recursive Level Order traversal (BFS)?"
+        options:
+          - "Stack"
+          - "Queue"
+          - "Priority Queue"
+          - "Hash Map"
+        correct_answer: 1
+        concepts: [bfs, data_structures]
+
+      - id: tree_s5_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: easy
+        prompt: |
+          BFS works by 'first-in, first-out' (FIFO) logic. We process a node, 
+          then put its children at the 'back of the line'. The Queue is 
+          the perfect line-management tool.
+        concepts: [fifo]
+
+# =========================================================
+# SLOT 6 — DELETION & POSTORDER
+# =========================================================
+
+  - slot_id: TREE_SLOT_6_POSTORDER
+    mental_install: "Deleting or freeing a hierarchy requires resolving children before the parent."
+    invariant: "Ancestors must persist until descendants are neutralized."
+    mastery_signals:
+      - Justifies postorder for deletion
+      - Traces memory cleanup sequence
+    hard_failures:
+      - Deletes parent before child (dangling pointers)
+
+    templates:
+      - id: tree_s6_deletion_logic
+        type: explanation
+        difficulty: medium
+        prompt: |
+          Explain why postorder traversal is the standard choice for deleting a binary tree. What happens if you use preorder?
+        rubric: "Must mention dependency resolution and avoiding loss of child access."
+        concepts: [postorder, memory_safety]
+
+      - id: tree_s6_remediation
+        base_id: tree_s6_deletion_logic
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Explain the hazard of deleting an object before its children. 
+          Show why postorder (Left, Right, Node) is safer for cleanup.
+
+      - id: tree_s6_mcq_deletion_order
+        type: mcq
+        difficulty: medium
+        prompt: "If you delete a parent node before its children, what happens in a language without garbage collection (like C++)?"
+        options:
+          - "The children are automatically deleted"
+          - "You lose the pointers to the children, causing a memory leak"
+          - "The tree becomes a linked list"
+          - "The root is moved to the leaf"
+        correct_answer: 1
+        concepts: [memory_safety, postorder]
+
+      - id: tree_s6_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: medium
+        prompt: |
+          A parent node 'owns' the addresses of its children. Deleting the parent 
+          first 'burns the map' to the children, leaving them stranded in memory forever.
+        concepts: [pointers]
+
+# =========================================================
+# SLOT 7 — PATH ANALYSIS
+# =========================================================
+
+  - slot_id: TREE_SLOT_7_PATHS
+    mental_install: "Root-to-leaf paths represent unique decision sequences."
+    invariant: "A path is defined by the set of recursive choices from root."
+    mastery_signals:
+      - Passes accumulating state down
+      - Validates leaf conditions
+    hard_failures:
+      - Fails to reset state on backtrack
+      - Misidentifies leaf nodes
+
+    templates:
+      - id: tree_s7_pathsum
+        type: coding
+        difficulty: easy
+        prompt: "Check if tree has a root-to-leaf path with sum equal to target."
+        language: python
+        starter_code: |
+          def hasPathSum(root, targetSum):
+              pass
+        concepts: [recursion, state_tracking]
+
+      - id: tree_s7_remediation
+        base_id: tree_s7_pathsum
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Trace how targetSum decrements at each recursive call. 
+          Identify exactly what makes a node a 'leaf'.
+
+      - id: tree_s7_mcq_leaf_check
+        type: mcq
+        difficulty: easy
+        prompt: "In the 'Path Sum' problem, which condition correctly identifies a leaf node?"
+        options:
+          - "if not node:"
+          - "if not node.left or not node.right:"
+          - "if not node.left and not node.right:"
+          - "if node.val == currentSum:"
+        correct_answer: 2
+        concepts: [tree_terminology]
+
+      - id: tree_s7_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: easy
+        prompt: |
+          A leaf is a dead-end. It has NO left child AND NO right child. 
+          If either exists, you haven't reached the end of the path yet.
+        concepts: [logical_conjunction]
+
+# =========================================================
+# SLOT 8 — ANCESTRY & LOBBYING
+# =========================================================
+
+  - slot_id: TREE_SLOT_8_LCA
+    mental_install: "Ancestry is the shared history of two subtrees."
+    invariant: "The LCA is the deepest node that has both $p$ and $q$ as descendants."
+    mastery_signals:
+      - Identifies split points in recursion
+      - Uses return values to signal discovery
+    hard_failures:
+      - Searches whole tree unnecessarily
+      - Misinterprets 'descendant' to exclude the node itself
+
+    templates:
+      - id: tree_s8_lca
+        type: coding
+        difficulty: medium
+        prompt: "Find the Lowest Common Ancestor of two nodes in a BST."
+        language: python
+        starter_code: |
+          def lowestCommonAncestor(root, p, q):
+              pass
+        concepts: [ancestry, bst]
+
+      - id: tree_s8_remediation
+        base_id: tree_s8_lca
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Explain the BST search logic for LCA. 
+          Why is it that if (p < root) and (q > root), the root MUST be the LCA?
+
+      - id: tree_s8_mcq_split
+        type: mcq
+        difficulty: medium
+        prompt: "In a BST, if both target nodes P and Q are smaller than the current root, where must the LCA be?"
+        options:
+          - "In the right subtree"
+          - "The current root itself"
+          - "In the left subtree"
+          - "It doesn't exist"
+        correct_answer: 2
+        concepts: [bst_properties, recursion]
+
+      - id: tree_s8_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: medium
+        prompt: |
+          Since the BST property is global, if both P and Q are smaller than the 
+          root, they both inhabit the left side. We must 'descend' left to 
+          narrow down the ancestor.
+        concepts: [binary_search]
+
+# =========================================================
+# SLOT 9 — RECONSTRUCTION
+# =========================================================
+
+  - slot_id: TREE_SLOT_9_BUILD
+    mental_install: "Traversals are fingerprints that can reconstruct the original tree."
+    invariant: "Inorder + (Preorder/Postorder) uniquely identifies a binary tree."
+    mastery_signals:
+      - Maps root from preorder to inorder ranges
+      - Decouples range logic from node creation
+    hard_failures:
+      - Cannot reconcile overlapping ranges
+      - Incorrectly splits subtree arrays
+
+    templates:
+      - id: tree_s9_build
+        type: coding
+        difficulty: hard
+        prompt: "Construct a binary tree from preorder and inorder traversals."
+        language: python
+        starter_code: |
+          def buildTree(preorder, inorder):
+              pass
+        concepts: [traversal, split_and_conquer]
+
+      - id: tree_s9_remediation
+        base_id: tree_s9_build
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Explain why preorder[0] is the root. 
+          Show how to use that root's index in inorder to split the left and right subtrees.
+
+      - id: tree_s9_mcq_unique
+        type: mcq
+        difficulty: medium
+        prompt: "Why is an 'Inorder' traversal necessary for unique tree reconstruction?"
+        options:
+          - "Because it identifies the root"
+          - "Because it provides the left/right boundaries for each subtree"
+          - "Because it is the fastest traversal"
+          - "Because it lists nodes alphabetically"
+        correct_answer: 1
+        concepts: [tree_reconstruction]
+
+      - id: tree_s9_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: medium
+        prompt: |
+          Preorder tells you WHO the root is, but it doesn't tell you how many 
+          nodes are on its left or right. Inorder tells you EXACTLY who is 
+          on which side of that root.
+        concepts: [subproblem_split]
+
+# =========================================================
+# SLOT 10 — SYMMETRY
+# =========================================================
+
+  - slot_id: TREE_SLOT_10_SYMMETRY
+    mental_install: "Symmetry in trees is a recursive mirror invariant."
+    invariant: "Left child of Left subtree equals Right child of Right subtree."
+    mastery_signals:
+      - Implements multi-pointer recursion
+      - Traces mirror conditions
+    hard_failures:
+      - Checks individual nodes in isolation
+      - Misaligns children in comparison
+
+    templates:
+      - id: tree_s10_symmetric
+        type: coding
+        difficulty: easy
+        prompt: "Determine if a binary tree is a mirror of itself."
+        language: python
+        starter_code: |
+          def isSymmetric(root):
+              pass
+        concepts: [symmetry, recursion]
+
+      - id: tree_s10_remediation
+        base_id: tree_s10_symmetric
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Explain why comparing (node1.left, node2.right) and (node1.right, node2.left) 
+          is the core of the mirror invariant.
+
+      - id: tree_s10_mcq_mirror
+        type: mcq
+        difficulty: medium
+        prompt: "To check if two subtrees are mirrors, if you are at nodes L and R, what should you compare next?"
+        options:
+          - "L.left with R.left"
+          - "L.left with R.right AND L.right with R.left"
+          - "L.val with R.val only"
+          - "L.parent with R.parent"
+        correct_answer: 1
+        concepts: [symmetry, invariants]
+
+      - id: tree_s10_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: medium
+        prompt: |
+          Symmetry means 'flipped'. The outer branches must match, and the 
+          inner branches must match. It's like folding a piece of paper.
+        concepts: [mirroring]
+
+# =========================================================
+# SLOT 11 — EFFICIENCY TRADEOFFS
+# =========================================================
+
+  - slot_id: TREE_SLOT_11_ANALYSIS
+    mental_install: "Tree-based search trades memory complexity for logarithmic time."
+    invariant: "BST Search is $O(h)$, while Linear Search is $O(n)$."
+    mastery_signals:
+      - Compares list vs tree performance
+      - Connects tree height to balance
+    hard_failures:
+      - Assumes $O(\log n)$ for skewed trees
+      - Ignores constant factors in pointers
+
+    templates:
+      - id: tree_s11_bst_vs_list
+        type: explanation
+        difficulty: medium
+        prompt: |
+          Compare searching for an element in a sorted list vs a balanced BST. 
+          When would you choose the list?
+        rubric: "Must mention pointer overhead and contiguous memory vs search speed."
+        concepts: [complexity, tradeoffs]
+
+      - id: tree_s11_remediation
+        base_id: tree_s11_bst_vs_list
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Review the memory/performance tradeoff. 
+          Explain why O(log n) is powerful but node pointers add up.
+
+      - id: tree_s11_mcq_skewed
+        type: mcq
+        difficulty: easy
+        prompt: "What is the time complexity of searching in a BST that has been 'skewed' (every node has only a right child)?"
+        options:
+          - "$O(1)$"
+          - '$O(\log N)$'
+          - "$O(N)$"
+          - '$O(N \log N)$'
+        correct_answer: 2
+        concepts: [worst_case, complexity]
+
+      - id: tree_s11_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: easy
+        prompt: |
+          A skewed tree is just a Linked List in disguise! Without the 
+          'balance' to provide shortcuts, we have to look at every single 
+          node one by one.
+        concepts: [degeneration]
+
+# =========================================================
+# SLOT 12 — SERIALIZATION & RECONSTRUCTION
+# =========================================================
+
+  - slot_id: TREE_SLOT_12_SERIALIZATION
+    mental_install: "Serialization maps a non-linear tree into a linear string, and back."
+    invariant: "A unique binary tree can be reconstructed from its preorder traversal if 'null' markers are preserved."
+    mastery_signals:
+      - Implements serialize and deserialize functions
+      - Correctly handles null leaf nodes in the string representation
+    hard_failures:
+      - Fails to serialize null nodes, making reconstruction ambiguous
+      - Uses excessive memory during string concatenation
+
+    templates:
+      - id: tree_s12_serialize
+        type: coding
+        difficulty: hard
+        prompt: "Design an algorithm to serialize and deserialize a binary tree."
+        language: python
+        starter_code: |
+          class Codec:
+              def serialize(self, root): pass
+              def deserialize(self, data): pass
+        concepts: [serialization, string_parsing, tree_reconstruction]
+
+      - id: tree_s12_remediation
+        type: explanation
+        variant: remediation
+        difficulty: hard
+        prompt: |
+          Think of 'Flattening' the tree. 
+          1. Use Preorder traversal (Root -> Left -> Right).
+          2. Represent 'None' as '#' or 'null'.
+          3. How do you use a Queue to rebuild the tree from that string?
+        concepts: [mapping_logic]
+
+      - id: tree_s12_mcq_uniqueness
+        type: mcq
+        difficulty: hard
+        prompt: "Why can't we reconstruct a tree from just a Preorder sequence if we EXCLUDE the null nodes?"
+        options:
+          - "Because preorder is too fast"
+          - "Without nulls, we don't know when a branch ends, making the structure ambiguous"
+          - "Preorder only visits the left side"
+          - "It's actually possible"
+        correct_answer: 1
+        concepts: [structural_integrity]
+
+      - id: tree_s12_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: medium
+        prompt: |
+          In a full binary tree with null markers, every leaf has two null 
+          children. These markers act like 'parentheses' in an expression, 
+          telling us exactly where a subtree starts and ends.
+        concepts: [uniqueness_invariants]

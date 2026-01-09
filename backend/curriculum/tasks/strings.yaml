@@ -32,6 +32,15 @@ slots:
         rubric: "Must mention contiguous layout and immutability consequence."
         concepts: [memory_model, immutability]
 
+      - id: strings_s1_remediation
+        base_id: strings_s1_memory_explain
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Explain the 'Copy-on-Modify' hazard. 
+          If you change one character in a $100MB$ string, why is it expensive in an immutable language?
+
       - id: strings_s1_access
         type: coding
         difficulty: easy
@@ -41,6 +50,28 @@ slots:
           def solve(s, i):
               pass
         concepts: [indexing, strings]
+
+      - id: strings_s1_mcq_immutability
+        type: mcq
+        difficulty: easy
+        prompt: "In many languages like Python or Java, what happens when you 'change' a character in a string?"
+        options:
+          - "The character is updated in the original memory block"
+          - "A new string is created with the change, leaving the original unchanged"
+          - "Only the specific memory address of that character is updated"
+          - "The string is converted to a list automatically"
+        correct_answer: 1
+        concepts: [immutability, memory_management]
+
+      - id: strings_s1_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: easy
+        prompt: |
+          Strings are often immutable. Think of them as a printed page. 
+          To change a word, you can't erase it; you must print a whole new page 
+          with the correction.
+        concepts: [immutability]
 
 # =========================================================
 # SLOT 2 — ITERATION & FREQUENCY STATE
@@ -79,6 +110,36 @@ slots:
               pass
         concepts: [frequency, traversal]
 
+      - id: strings_s2_remediation
+        base_id: strings_s2_frequency
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Explain 'The Histogram Model'. 
+          Show how to use a dictionary or a $26$-character array to record occurrences as you scan the string once.
+
+      - id: strings_s2_mcq_frequency
+        type: mcq
+        difficulty: easy
+        prompt: "Which data structure is most efficient for counting the frequency of every character in a long string?"
+        options:
+          - "A sorted list"
+          - "A hash map (dictionary)"
+          - "A stack"
+          - "A linked list"
+        correct_answer: 1
+        concepts: [frequency_counting, time_complexity]
+
+      - id: strings_s2_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: easy
+        prompt: |
+          A hash map (dictionary) allows us to look up and update the count 
+          for any character in constant time, O(1), making it the fastest choice.
+        concepts: [hash_map, O(1)]
+
 # =========================================================
 # SLOT 3 — SUBSTRING & WINDOW THINKING
 # =========================================================
@@ -105,6 +166,36 @@ slots:
           def solve(s):
               pass
         concepts: [sliding_window, substring]
+
+      - id: strings_s3_remediation
+        base_id: strings_s3_longest_unique
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Explain 'The Caterpillar Walk'. 
+          If you encounter a duplicate character at the 'head' ($Right$ pointer), why must you move the 'tail' ($Left$ pointer) past the previous occurrence of that character?
+
+      - id: strings_s3_mcq_sliding_window
+        type: mcq
+        difficulty: medium
+        prompt: "How many substrings are in a string of length N?"
+        options:
+          - "N"
+          - "N^2 (Proportional to)"
+          - "2^N"
+          - "log N"
+        correct_answer: 1
+        concepts: [substrings, combinations]
+
+      - id: strings_s3_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: easy
+        prompt: |
+          There are N choices for the start and roughly N choices for the end,
+          leading to about N*(N+1)/2 substrings, which is O(N^2).
+        concepts: [complexity]
 
 # =========================================================
 # SLOT 4 — STRING TRANSFORMATION COST
@@ -133,6 +224,37 @@ slots:
               pass
         concepts: [immutability, builders]
 
+      - id: strings_s4_remediation
+        base_id: strings_s4_reverse
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Compare $String += char$ vs $List.append(char)$. 
+          Explain why the latter is $O(1)$ while the former is $O(N)$ due to immutability.
+
+      - id: strings_s4_mcq_concatenation
+        type: mcq
+        difficulty: medium
+        prompt: "Why is repeated string concatenation inside a loop (str += char) considered inefficient?"
+        options:
+          - "It makes the string too long to process"
+          - "Each addition requires copying the entire existing string"
+          - "The compiler cannot optimize loops with strings"
+          - "It uses too much CPU for character encoding"
+        correct_answer: 1
+        concepts: [immutability, concatenation_cost]
+
+      - id: strings_s4_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: easy
+        prompt: |
+          Because strings are immutable, `s += 'a'` creates a new string 
+          of size `len(s)+1`. If done in a loop, you copy 1, then 2, then 3 characters, 
+          leading to O(N^2) total work.
+        concepts: [time_complexity]
+
 # =========================================================
 # SLOT 5 — PATTERN MATCHING MENTAL MODEL
 # =========================================================
@@ -160,6 +282,37 @@ slots:
               pass
         concepts: [pattern_matching]
 
+      - id: strings_s5_remediation
+        base_id: strings_s5_naive_match
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Explain 'The Sliding Frame' search. 
+          Identify the worst-case scenario for naive matching (e.g., searching for 'aaa' in 'aaaaaaaaab').
+
+      - id: strings_s5_mcq_naive_search
+        type: mcq
+        difficulty: easy
+        prompt: "What is the worst-case time complexity of a naive string search for a pattern of length M in a text of length N?"
+        options:
+          - "O(N)"
+          - "O(N * M)"
+          - "O(N + M)"
+          - "O(2^N)"
+        correct_answer: 1
+        concepts: [complexity, search_algorithms]
+
+      - id: strings_s5_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: easy
+        prompt: |
+          In the worst case (e.g., searching "AAAAAB" in "AAAAAAAAA"), 
+          for every position in the text (N), we might check all characters 
+          of the pattern (M).
+        concepts: [worst_case]
+
 # =========================================================
 # SLOT 6 — ENCODING & COMPARISON
 # =========================================================
@@ -186,3 +339,371 @@ slots:
           def solve(a, b):
               pass
         concepts: [encoding, normalization]
+
+      - id: strings_s6_remediation
+        base_id: strings_s6_compare
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Explain 'Normalization'. 
+          Why must you convert 'A' and 'a' to a common base (like lowercase) before comparing if you want value-equality rather than identity-equality?
+
+      - id: strings_s6_mcq_encoding
+        type: mcq
+        difficulty: easy
+        prompt: "Why can we use 'ord(char)' in Python to compare the order of two strings?"
+        options:
+          - "It returns the character's lucky number"
+          - "It returns the numeric Unicode/ASCII code for that character"
+          - "It calculates the frequency of the character"
+          - "It converts the character to a boolean"
+        correct_answer: 1
+        concepts: [encoding, ordinal_comparison]
+
+      - id: strings_s6_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: easy
+        prompt: |
+          Computers don't know 'A' or 'B'; they know numbers. Lexicographical 
+          order is based on the underlying numeric codes assigned to each 
+          character.
+        concepts: [ascii_unicode]
+
+# =========================================================
+# SLOT 7 — THE CONVERGENCE INVARIANT
+# =========================================================
+
+  - slot_id: STRING_SLOT_7_TWO_POINTERS
+    mental_install: "Linear strings can be analyzed by moving pointers towards one another."
+    invariant: "Symmetry requirements hold true between Left and Right cursors."
+    mastery_signals:
+      - Normalizes input (case/punctuated) before processing
+      - Converges pointers efficiently without extra space
+    hard_failures:
+      - Creates a reversed copy of the string (violates $O(1)$ space goal)
+      - Fails to skip non-alphanumeric characters
+
+    templates:
+      - id: strings_s7_valid_palindrome
+        type: coding
+        difficulty: medium
+        prompt: "Check if a string is a palindrome after removing non-alphanumeric characters."
+        language: python
+        starter_code: |
+          def isPalindrome(s):
+              pass
+        concepts: [two_pointers, normalization]
+
+      - id: strings_s7_remediation
+        base_id: strings_s7_valid_palindrome
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Explain 'The Mirror Invariant'. 
+          If $s[Left] == s[Right]$, why can we discard both and check the inner string? 
+          How do we handle skip-characters like spaces?
+
+      - id: strings_s7_mcq_two_pointers
+        type: mcq
+        difficulty: medium
+        prompt: "When checking if a string is a palindrome using two pointers, what is the terminating condition?"
+        options:
+          - "When the left pointer reaches the end"
+          - "When the right pointer reaches the beginning"
+          - "When the left pointer is no longer less than the right pointer"
+          - "When the first character is found"
+        correct_answer: 2
+        concepts: [two_pointers, symmetry]
+
+      - id: strings_s7_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: easy
+        prompt: |
+          The pointers move toward each other. Once they cross or meet in the 
+          middle, you have checked all symmetric pairs and the process is complete.
+        concepts: [pointers]
+
+# =========================================================
+# SLOT 8 — STATEFUL COMPRESSION
+# =========================================================
+
+  - slot_id: STRING_SLOT_8_COMPRESSION
+    mental_install: "Repeating characters can be represented as (char, count) pairs."
+    invariant: "Compression is only beneficial if the encoded length is shorter than the original."
+    mastery_signals:
+      - Uses a counter to track spans of identical characters
+      - Modifies an array in-place or uses a builder
+    hard_failures:
+      - Loses the last character group
+      - Incorrectly handles single characters (e.g., 'a' becoming 'a1' when shorter is better)
+
+    templates:
+      - id: strings_s8_compress
+        type: coding
+        difficulty: medium
+        prompt: "Implement basic run-length encoding (e.g., 'aaabb' -> 'a3b2')."
+        language: python
+        starter_code: |
+          def compress(s):
+              pass
+        concepts: [encoding, repetition]
+
+      - id: strings_s8_remediation
+        base_id: strings_s8_compress
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Explain 'The Span invariant'. 
+          How do you detect when a sequence of identical characters has ended? 
+          Show why you must handle the 'last group' after the loop ends or by checking $i+1$.
+
+      - id: strings_s8_mcq_compression
+        type: mcq
+        difficulty: medium
+        prompt: "Why might a compressed string sometimes be longer than the original string?"
+        options:
+          - "Compression always makes strings shorter"
+          - "If characters don't repeat (e.g., 'abcde' -> 'a1b1c1d1e1')"
+          - "Compression adds a secret header to the string"
+          - "Encoding characters are always 2 bytes"
+        correct_answer: 1
+        concepts: [compression, efficiency]
+
+      - id: strings_s8_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: easy
+        prompt: |
+          Run-length encoding (RLE) depends on groups of identical characters. 
+          If characters are unique, you add a 'length' character for every single 
+          original character, doubling the size.
+        concepts: [RLE]
+
+# =========================================================
+# SLOT 9 — HORIZONTAL VS VERTICAL SCANNING
+# =========================================================
+
+  - slot_id: STRING_SLOT_9_PREFIXES
+    mental_install: "The longest common prefix is the intersection of all string starts."
+    invariant: "The global prefix cannot be longer than the shortest string in the set."
+    mastery_signals:
+      - Compares strings character-by-character across multiple indices
+      - Terminates as soon as an alignment mismatch occurs
+    hard_failures:
+      - Excessively compares long strings after a prefix mismatch is found
+
+    templates:
+      - id: strings_s9_lcp
+        type: coding
+        difficulty: easy
+        prompt: "Find the longest common prefix among an array of strings."
+        language: python
+        starter_code: |
+          def longestCommonPrefix(strs):
+              pass
+        concepts: [alignment, set_intersection]
+
+      - id: strings_s9_remediation
+        base_id: strings_s9_lcp
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Explain 'Vertical Comparison'. 
+          Why do we look at character $0$ across ALL strings before looking at character $1$?
+
+      - id: strings_s9_mcq_prefix
+        type: mcq
+        difficulty: easy
+        prompt: "If the first characters of two strings don't match, what is their longest common prefix?"
+        options:
+          - "The shorter string"
+          - "The longer string"
+          - "An empty string"
+          - "The space character"
+        correct_answer: 2
+        concepts: [prefixes, comparison]
+
+      - id: strings_s9_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: easy
+        prompt: |
+          A common prefix must exist at the very beginning of all strings.
+          If even the first character is different, there is no shared start.
+        concepts: [edge_cases]
+
+# =========================================================
+# SLOT 10 — ROLLING HASH INVARIANTS
+# =========================================================
+
+  - slot_id: STRING_SLOT_10_ROLLING_HASH
+    mental_install: "Substring hashes can be updated in O(1) by subtracting the 'out' char and adding the 'in' char."
+    invariant: '$NewHash = (OldHash - OutVal) \times Base + InVal$.'
+    mastery_signals:
+      - Explains why rolling hashes enable $O(n)$ search for $O(m)$ patterns
+      - Identifies the role of prime numbers and modulo in reducing collisions
+    hard_failures:
+      - Thinks you must recompute the hash from scratch for every window shift
+
+    templates:
+      - id: strings_s10_rolling_hash_model
+        type: explanation
+        difficulty: hard
+        prompt: |
+          Explain the 'Rolling Hash' technique. How does it allow us to search for a pattern 
+          of length M in a text of length N in O(N) time?
+        rubric: "Must mention O(1) hash updates and avoiding re-scanning the window."
+        concepts: [hashing, sliding_window, Rabin-Karp]
+
+      - id: strings_s10_remediation
+        base_id: strings_s10_rolling_hash_model
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Explain 'Sliding Window Hashing'. 
+          If the hash of 'abc' is known, show why calculating 'bcd' only requires removing 'a' and adding 'd'—avoiding $O(M)$ work at each step.
+
+      - id: strings_s10_mcq_rolling_hash
+        type: mcq
+        difficulty: hard
+        prompt: "What is the main benefit of a 'Rolling Hash' over a standard hash function in substring search?"
+        options:
+          - "It produces fewer collisions"
+          - "It can be updated in O(1) when the window shifts"
+          - "It uses less memory"
+          - "It works on non-string data"
+        correct_answer: 1
+        concepts: [rolling_hash, complexity]
+
+      - id: strings_s10_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: medium
+        prompt: |
+          A standard hash would require O(M) time to recompute for every window.
+          A rolling hash allows us to update the hash value based only on the
+          characters entering and leaving, which takes constant time.
+        concepts: [hashing_efficiency]
+
+# =========================================================
+# SLOT 11 — PERMUTATION IDENTITY
+# =========================================================
+
+  - slot_id: STRING_SLOT_11_ANAGRAMS
+    mental_install: "Anagrams are permutations; they share the same character count signature."
+    invariant: "Two strings are anagrams if and only if their sorted versions or frequency maps are equal."
+    mastery_signals:
+      - Uses a fixed-size array (26 slots) or hash map for counts
+      - Detects character frequency mismatch in $O(n)$ time
+    hard_failures:
+      - Uses $O(n \log n)$ sorting when $O(n)$ frequency counting is possible
+      - Fails on strings of different lengths
+
+    templates:
+      - id: strings_s11_is_anagram
+        type: coding
+        difficulty: easy
+        prompt: "Determine if two strings are anagrams of each other."
+        language: python
+        starter_code: |
+          def isAnagram(s, t):
+              pass
+        concepts: [frequency_counting, permutations]
+
+      - id: strings_s11_remediation
+        base_id: strings_s11_is_anagram
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Explain 'The Bag of Letters' analogy. 
+          Identify why sorting $(O(N \log N))$ and frequency counting $(O(N))$ both confirm that two words share the same multiset of characters.
+
+      - id: strings_s11_mcq_anagrams
+        type: mcq
+        difficulty: easy
+        prompt: "If two strings have different lengths, can they be anagrams?"
+        options:
+          - "Yes, if they share the same unique characters"
+          - "No, because anagrams must have identical character counts for all characters"
+          - "Only if one is a substring of the other"
+          - "Only if they are both empty"
+        correct_answer: 1
+        concepts: [anagrams, invariants]
+
+      - id: strings_s11_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: easy
+        prompt: |
+          Anagrams must have the exact same characters in the exact same frequencies.
+          If the lengths differ, it's impossible for the counts to match exactly.
+        concepts: [counting]
+
+# =========================================================
+# SLOT 12 — STATEFUL PARSING
+# =========================================================
+
+  - slot_id: STRING_SLOT_12_PARSING
+    mental_install: "Parsing converts raw strings into structured data types using state-based logic."
+    invariant: "Character transitions must respect constraints (whitespace, signs, overflow)."
+    mastery_signals:
+      - Implements string-to-integer (atoi) with overflow handling
+      - Manages state transitions (sign -> digits -> termination)
+    hard_failures:
+      - Ignores whitespace or sign handling
+      - Fails to detect numerical overflow/underflow
+      - Uses high-level built-ins (int()) where manual parsing is required
+
+    templates:
+      - id: string_s12_atoi
+        type: coding
+        difficulty: hard
+        prompt: "Implement the myAtoi(s) function, which converts a string to a 32-bit signed integer."
+        language: python
+        starter_code: |
+          def myAtoi(s):
+              pass
+        concepts: [parsing, state_machines, boundary_control]
+
+      - id: string_s12_remediation
+        type: explanation
+        variant: remediation
+        difficulty: medium
+        prompt: |
+          Think of a flowchart.
+          1. Skip spaces.
+          2. Check for '+' or '-'.
+          3. Read digits until non-digit found.
+          4. Clamp to 32-bit range.
+          Why is the 'clamping' step necessary in a state machine?
+        concepts: [flow_control]
+
+      - id: string_s12_mcq_overflow
+        type: mcq
+        difficulty: medium
+        prompt: "Why must we check for overflow BEFORE multiplying the current sum by 10 during parsing?"
+        options:
+          - "Because multiplication is slow"
+          - "To prevent the value from exceeding integer limits and wrapping around"
+          - "Because strings cannot store large numbers"
+          - "To make the code shorter"
+        correct_answer: 1
+        concepts: [overflow_prevention]
+
+      - id: string_s12_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: medium
+        prompt: |
+          In systems with fixed-width integers (like 32-bit), once you pass 
+          the limit, the number might become negative or inaccurate. Checking 
+          right before the 'leap' (multiplying by 10) keeps the data safe.
+        concepts: [data_integrity]

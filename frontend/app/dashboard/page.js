@@ -12,6 +12,17 @@ export default function DashboardPage() {
   const { user, isAuthenticated, loading, refreshUser } = useAuth();
   const [roadmapData, setRoadmapData] = useState(null);
   const [isRoadmapLoading, setIsRoadmapLoading] = useState(true);
+  const [userProfile, setUserProfile] = useState(null);
+
+  useEffect(() => {
+    if (!loading && isAuthenticated) {
+      const APP_URL = process.env.NEXT_PUBLIC_APP_URL || '';
+      fetch(`${APP_URL}/api/general_profile`, { credentials: "include" })
+        .then(res => res.json())
+        .then(data => setUserProfile(data))
+        .catch(err => console.error("Error fetching profile:", err));
+    }
+  }, [loading, isAuthenticated]);
 
   useEffect(() => {
     if (!loading) {
@@ -139,28 +150,89 @@ export default function DashboardPage() {
   if (loading || !isAuthenticated || (user && !user.is_setup_completed) || isRoadmapLoading) {
     return (
       <div className="min-h-screen bg-[#030712] flex items-center justify-center">
-        <div className="animate-spin w-8 h-8 border-2 border-violet-500 border-t-transparent rounded-full" />
+        <div className="relative">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="h-2 w-2 bg-emerald-500 rounded-full animate-pulse"></div>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#030712] text-white flex flex-col">
-      
-      <div className="container-app py-6 md:py-10 max-w-5xl mx-auto px-4 grow">
-        <h1 className="text-2xl font-bold mb-6">Active Context</h1>
-        
-        <div className="space-y-6">
-          {/* Main Content Area - Slot State */}
-          <div className="space-y-6">
-            <section>
+    <div className="min-h-screen bg-[#030712] text-white selection:bg-emerald-500/30">
+      {/* Background Ambience */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <div className="absolute top-[-10%] right-[-5%] w-125 h-125 bg-emerald-600/5 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-10%] left-[-10%] w-150 h-150 bg-blue-600/5 rounded-full blur-[120px]" />
+      </div>
+
+      <div className="relative z-10 max-w-5xl mx-auto p-6 md:p-10 space-y-12 transition-all duration-500">
+        {/* Header Section */}
+        <div className="flex flex-col gap-2 border-b border-white/5 pb-8">
+          <p className="text-emerald-400 font-mono text-xs uppercase tracking-[0.3em] font-bold">Commander Center</p>
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
+            <span className="bg-linear-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
+              Welcome, {userProfile?.name || userProfile?.username || user?.username || user?.name || 'Explorer'}
+            </span>
+          </h1>
+          <p className="text-slate-400 max-w-lg text-lg">
+            Your journey through {roadmapData?.goal || 'strategic skills'} continues here.
+          </p>
+        </div>
+
+        {/* Main Content Area - Slot State */}
+        <div className="grid gap-8">
+          <section className="relative group">
+            {/* Context Header */}
+            <div className="flex items-center gap-3 mb-6">
+               <div className="w-1.5 h-6 bg-emerald-500 rounded-full" />
+               <h2 className="text-sm font-bold text-slate-200 uppercase tracking-widest">Active Mission</h2>
+            </div>
+            
+            <div className="bg-linear-to-br from-white/5 to-transparent border border-white/10 rounded-3xl p-1 overflow-hidden shadow-2xl">
               <SlotStateEnforcement 
                 activeSlot={activeSlotData} 
                 lockedReason={null}
                 onStart={handleStartSlot}
                 onContinue={handleContinueSlot}
               />
-            </section>
+            </div>
+          </section>
+
+          {/* Stats/Quick Actions Placeholder */}
+          <div className="grid md:grid-cols-4 gap-6">
+             <div className="p-6 rounded-2xl bg-white/2 border border-white/5 hover:bg-white/5 transition-all group">
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Status</p>
+                <div className="flex items-center gap-2">
+                   <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                   <p className="text-xl font-bold text-emerald-400 capitalize">{activeSlotData?.status?.replace(/_/g, ' ') || 'Standby'}</p>
+                </div>
+             </div>
+             
+             <div className="p-6 rounded-2xl bg-white/2 border border-white/5 hover:bg-white/5 transition-all group">
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Target Skill</p>
+                <p className="text-xl font-bold text-slate-200 capitalize">{activeSlotData?.skill?.replace(/_/g, ' ') || 'None'}</p>
+             </div>
+
+             <div className="p-6 rounded-2xl bg-white/2 border border-white/5 hover:bg-white/5 transition-all group">
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Difficulty</p>
+                <span className={`text-xl font-bold capitalize ${
+                  activeSlotData?.difficulty === 'easy' ? 'text-emerald-400' :
+                  activeSlotData?.difficulty === 'medium' ? 'text-amber-400' :
+                  'text-rose-400'
+                }`}>
+                  {activeSlotData?.difficulty || 'N/A'}
+                </span>
+             </div>
+
+             <div className="p-6 rounded-2xl bg-white/2 border border-white/5 hover:bg-white/5 transition-all group">
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Quest Type</p>
+                <p className="text-xl font-bold text-purple-400 capitalize">
+                  {activeSlotData?.question_type || activeSlotData?.type || 'Standard'}
+                </p>
+             </div>
           </div>
         </div>
       </div>

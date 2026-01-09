@@ -32,47 +32,125 @@ phases:
 
       - slot_id: ARRAY_SLOT_1_MEMORY_MODEL
         skill: arrays
+        difficulty: easy
+        type: explanation
 
       - slot_id: ARRAY_SLOT_2_ITERATION
         skill: arrays
+        difficulty: easy
+        type: coding
 
       - slot_id: ARRAY_SLOT_3_SUBARRAY
         skill: arrays
+        difficulty: easy
+        type: explanation
 
       - slot_id: ARRAY_SLOT_4_SHIFTING_MODEL
         skill: arrays
+        difficulty: easy
+        type: coding
 
       - slot_id: ARRAY_SLOT_5_POSITIONAL_COST
         skill: arrays
+        difficulty: medium
+        type: explanation
 
       - slot_id: ARRAY_SLOT_6_ACCESS_VS_SEARCH
         skill: arrays
+        difficulty: medium
+        type: coding
 
       - slot_id: ARRAY_SLOT_7_BOUNDARIES
         skill: arrays
+        difficulty: medium
+        type: coding
 
       - slot_id: ARRAY_SLOT_8_OPTIMIZATION
         skill: arrays
+        difficulty: medium
+        type: coding
+
+      - slot_id: ARRAY_SLOT_9_PARTITIONING
+        skill: arrays
+        difficulty: hard
+        type: coding
+
+      - slot_id: ARRAY_SLOT_10_INTERVALS
+        skill: arrays
+        difficulty: hard
+        type: coding
+
+      - slot_id: ARRAY_SLOT_11_MATRICES
+        skill: arrays
+        difficulty: hard
+        type: coding
+
+      - slot_id: ARRAY_SLOT_12_ROTATION
+        skill: arrays
+        difficulty: hard
+        type: coding
 
       # -------- STRINGS --------
 
       - slot_id: STRING_SLOT_1_MEMORY_MODEL
         skill: strings
+        difficulty: easy
+        type: explanation
 
       - slot_id: STRING_SLOT_2_TRAVERSAL
         skill: strings
+        difficulty: easy
+        type: coding
 
       - slot_id: STRING_SLOT_3_SUBSTRINGS
         skill: strings
+        difficulty: easy
+        type: explanation
 
       - slot_id: STRING_SLOT_4_COST_MODEL
         skill: strings
+        difficulty: easy
+        type: explanation
 
       - slot_id: STRING_SLOT_5_PATTERN_MATCHING
         skill: strings
+        difficulty: medium
+        type: coding
 
       - slot_id: STRING_SLOT_6_ENCODING
         skill: strings
+        difficulty: medium
+        type: explanation
+
+      - slot_id: STRING_SLOT_7_TWO_POINTERS
+        skill: strings
+        difficulty: medium
+        type: coding
+
+      - slot_id: STRING_SLOT_8_COMPRESSION
+        skill: strings
+        difficulty: medium
+        type: coding
+
+      - slot_id: STRING_SLOT_9_PREFIXES
+        skill: strings
+        difficulty: hard
+        type: coding
+
+      - slot_id: STRING_SLOT_10_ROLLING_HASH
+        skill: strings
+        difficulty: hard
+        type: coding
+
+      - slot_id: STRING_SLOT_11_ANAGRAMS
+        skill: strings
+        difficulty: medium
+        type: coding
+
+      - slot_id: STRING_SLOT_12_PARSING
+        skill: strings
+        difficulty: hard
+        type: coding
 
 # =========================================================
 # PHASE 2 — INDIRECT MEMORY & POINTER STRUCTURES
@@ -96,15 +174,63 @@ phases:
 
       - slot_id: LINKED_LIST_SLOT_1_NODE_MODEL
         skill: linked_lists
+        difficulty: easy
+        type: explanation
 
       - slot_id: LINKED_LIST_SLOT_2_TRAVERSAL
         skill: linked_lists
+        difficulty: easy
+        type: coding
 
       - slot_id: LINKED_LIST_SLOT_3_INSERT_DELETE
         skill: linked_lists
+        difficulty: easy
+        type: coding
 
       - slot_id: LINKED_LIST_SLOT_4_CYCLE_DETECTION
         skill: linked_lists
+        difficulty: medium
+        type: coding
+
+      - slot_id: LINKED_LIST_SLOT_5_REVERSAL
+        skill: linked_lists
+        difficulty: medium
+        type: coding
+
+      - slot_id: LINKED_LIST_SLOT_6_DUMMY_NODES
+        skill: linked_lists
+        difficulty: medium
+        type: explanation
+
+      - slot_id: LINKED_LIST_SLOT_7_MERGE
+        skill: linked_lists
+        difficulty: medium
+        type: coding
+
+      - slot_id: LINKED_LIST_SLOT_8_POINTER_GAP
+        skill: linked_lists
+        difficulty: medium
+        type: explanation
+
+      - slot_id: LINKED_LIST_SLOT_9_MIDPOINT
+        skill: linked_lists
+        difficulty: medium
+        type: coding
+
+      - slot_id: LINKED_LIST_SLOT_10_DOUBLY
+        skill: linked_lists
+        difficulty: hard
+        type: coding
+
+      - slot_id: LINKED_LIST_SLOT_11_PALINDROME
+        skill: linked_lists
+        difficulty: medium
+        type: coding
+
+      - slot_id: LINKED_LIST_SLOT_12_FLATTENING
+        skill: linked_lists
+        difficulty: hard
+        type: coding
 
 # =========================================================
 # PHASE 3 — ACCESS DISCIPLINE SYSTEMS
@@ -127,18 +253,123 @@ phases:
 
       - slot_id: STACK_SLOT_1_LIFO
         skill: stacks
+        difficulty: easy
+        type: explanation
 
       - slot_id: STACK_SLOT_2_REVERSAL
         skill: stacks
+        difficulty: easy
+        type: coding
 
-      - slot_id: STACK_SLOT_3_MONOTONIC
+      - slot_id: STACK_SLOT_3_BALANCING
         skill: stacks
+        difficulty: medium
+        type: coding
+
+      - slot_id: STACK_SLOT_4_STATE_TRACKING
+        skill: stacks
+        difficulty: medium
+        type: coding
+
+      - slot_id: STACK_SLOT_5_EVALUATION
+        skill: stacks
+        difficulty: hard
+        type: coding
+
+      - slot_id: STACK_SLOT_6_CONVERSION
+        skill: stacks
+        difficulty: hard
+        type: coding
+
+      - slot_id: STACK_SLOT_7_SIMULATION
+        skill: stacks
+        difficulty: medium
+        type: coding
+
+      - slot_id: STACK_SLOT_8_CALL_STACK
+        skill: stacks
+        difficulty: medium
+        type: explanation
+
+      - slot_id: STACK_SLOT_9_TRAVERSAL
+        skill: stacks
+        difficulty: medium
+        type: coding
+
+      - slot_id: STACK_SLOT_10_MONOTONIC_BASIC
+        skill: stacks
+        difficulty: medium
+        type: coding
+
+      - slot_id: STACK_SLOT_11_MONOTONIC_ADV
+        skill: stacks
+        difficulty: hard
+        type: coding
+
+      - slot_id: STACK_SLOT_12_MULTI_STACK
+        skill: stacks
+        difficulty: hard
+        type: coding
 
       - slot_id: QUEUE_SLOT_1_FIFO
         skill: queues
+        difficulty: easy
+        type: explanation
 
       - slot_id: QUEUE_SLOT_2_BUFFERING
         skill: queues
+        difficulty: easy
+        type: coding
+
+      - slot_id: QUEUE_SLOT_3_BFS_LOGIC
+        skill: queues
+        difficulty: medium
+        type: explanation
+
+      - slot_id: QUEUE_SLOT_4_STACK_CONVERSION
+        skill: queues
+        difficulty: hard
+        type: coding
+
+      - slot_id: QUEUE_SLOT_5_SCHEDULING
+        skill: queues
+        difficulty: medium
+        type: coding
+
+      - slot_id: QUEUE_SLOT_6_LEVEL_ORDER
+        skill: queues
+        difficulty: medium
+        type: coding
+
+      - slot_id: QUEUE_SLOT_7_PRIORITY
+        skill: queues
+        difficulty: hard
+        type: coding
+
+      - slot_id: QUEUE_SLOT_8_CIRCULAR_INDEXING
+        skill: queues
+        difficulty: medium
+        type: explanation
+
+      - slot_id: QUEUE_SLOT_9_MOVING_AVERAGE
+        skill: queues
+        difficulty: medium
+        type: coding
+
+      - slot_id: QUEUE_SLOT_10_HIT_COUNTER
+        skill: queues
+        difficulty: medium
+        type: coding
+
+      - slot_id: QUEUE_SLOT_11_DEQUE_DESIGN
+        skill: queues
+        difficulty: hard
+        type: coding
+
+      - slot_id: QUEUE_SLOT_12_MONOTONIC_QUEUE
+        skill: queues
+        difficulty: hard
+        type: coding
 
 # =========================================================
 # PHASE 4 — DIRECT INDEXING SYSTEMS
@@ -162,12 +393,63 @@ phases:
 
       - slot_id: HASH_SLOT_1_MAPPING
         skill: hash_tables
+        difficulty: easy
+        type: explanation
 
       - slot_id: HASH_SLOT_2_COLLISIONS
         skill: hash_tables
+        difficulty: easy
+        type: explanation
 
       - slot_id: HASH_SLOT_3_FREQUENCY
         skill: hash_tables
+        difficulty: easy
+        type: coding
+
+      - slot_id: HASH_SLOT_4_RESOLUTION
+        skill: hash_tables
+        difficulty: medium
+        type: explanation
+
+      - slot_id: HASH_SLOT_5_DYNAMIC_RESIZING
+        skill: hash_tables
+        difficulty: medium
+        type: explanation
+
+      - slot_id: HASH_SLOT_6_GROUPING
+        skill: hash_tables
+        difficulty: medium
+        type: coding
+
+      - slot_id: HASH_SLOT_7_PREFIX_SUM
+        skill: hash_tables
+        difficulty: medium
+        type: coding
+
+      - slot_id: HASH_SLOT_8_INTERSECTION
+        skill: hash_tables
+        difficulty: medium
+        type: coding
+
+      - slot_id: HASH_SLOT_9_DESIGN
+        skill: hash_tables
+        difficulty: hard
+        type: coding
+
+      - slot_id: HASH_SLOT_10_BIJECTION
+        skill: hash_tables
+        difficulty: medium
+        type: coding
+
+      - slot_id: HASH_SLOT_11_LRU_CONCEPT
+        skill: hash_tables
+        difficulty: hard
+        type: coding
+
+      - slot_id: HASH_SLOT_12_TOP_K_ELEMENTS
+        skill: hash_tables
+        difficulty: hard
+        type: coding
 
 # =========================================================
 # PHASE 5 — HIERARCHICAL MEMORY
@@ -191,12 +473,60 @@ phases:
 
       - slot_id: TREE_SLOT_1_STRUCTURE
         skill: trees
+        difficulty: easy
+        type: explanation
 
       - slot_id: TREE_SLOT_2_TRAVERSAL
         skill: trees
+        difficulty: easy
+        type: coding
 
       - slot_id: TREE_SLOT_3_PROPERTIES
         skill: trees
+        difficulty: medium
+        type: explanation
 
       - slot_id: TREE_SLOT_4_BST
         skill: trees
+        difficulty: medium
+        type: coding
+
+      - slot_id: TREE_SLOT_5_BFS
+        skill: trees
+        difficulty: medium
+        type: coding
+
+      - slot_id: TREE_SLOT_6_POSTORDER
+        skill: trees
+        difficulty: medium
+        type: coding
+
+      - slot_id: TREE_SLOT_7_PATHS
+        skill: trees
+        difficulty: medium
+        type: coding
+
+      - slot_id: TREE_SLOT_8_LCA
+        skill: trees
+        difficulty: medium
+        type: coding
+
+      - slot_id: TREE_SLOT_9_BUILD
+        skill: trees
+        difficulty: hard
+        type: coding
+
+      - slot_id: TREE_SLOT_10_SYMMETRY
+        skill: trees
+        difficulty: medium
+        type: coding
+
+      - slot_id: TREE_SLOT_11_ANALYSIS
+        skill: trees
+        difficulty: medium
+        type: explanation
+
+      - slot_id: TREE_SLOT_12_SERIALIZATION
+        skill: trees
+        difficulty: hard
+        type: coding

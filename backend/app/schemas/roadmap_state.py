@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Literal, Optional, Set
 from datetime import datetime
 
@@ -10,6 +10,7 @@ class TaskSlot(BaseModel):
     slot_id: str
     skill: str
     difficulty: Literal["easy", "medium", "hard"]
+    question_type: Optional[Literal["mcq", "coding", "explanation"]] = Field(None, alias="type")
     status: Literal[
         "locked",
         "available",
@@ -32,6 +33,7 @@ class TaskSlot(BaseModel):
     evaluation_history: List[EvaluationSnapshot] = []
     flags: Set[str] = set()
 
+    model_config = {"populate_by_name": True}
 
 
 class PhaseState(BaseModel):

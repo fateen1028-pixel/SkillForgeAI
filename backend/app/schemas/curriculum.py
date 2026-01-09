@@ -16,7 +16,8 @@ class SlotRemediationPolicy(BaseModel):
 class SlotDefinition(BaseModel):
     id: str = Field(alias="slot_id")
     skill: str
-    difficulty: Optional[Literal["easy", "medium", "hard"]] = "easy"
+    difficulty: Literal["easy", "medium", "hard"]
+    question_type: Optional[Literal["mcq", "coding", "explanation"]] = Field(None, alias="type")
     
     # Policy Fields
     mastery: SlotMasteryPolicy = Field(default_factory=SlotMasteryPolicy)

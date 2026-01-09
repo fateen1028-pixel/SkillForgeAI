@@ -21,6 +21,7 @@ class TaskInstance(BaseModel):
     task_template_id: str        # resolved (may be remediation)
 
     difficulty: Literal["easy", "medium", "hard"]
+    question_type: Optional[Literal["mcq", "coding", "explanation"]] = Field(None, alias="type")
 
     status: TaskStatus = TaskStatus.IN_PROGRESS
 
@@ -28,3 +29,5 @@ class TaskInstance(BaseModel):
     completed_at: Optional[datetime] = None
 
     evaluation_signals: Dict[str, float] = Field(default_factory=dict)
+
+    model_config = {"populate_by_name": True}

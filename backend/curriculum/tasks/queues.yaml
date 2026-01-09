@@ -36,6 +36,37 @@ slots:
                   pass
         concepts: [fifo, circular_buffer]
 
+      - id: queue_s1_remediation
+        base_id: queue_s1_impl
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Explain the 'Standing in Line' analogy. 
+          Show why the first person in must be the first one to be served. 
+          Trace the 'head' pointer through three dequeues.
+
+      - id: queue_s1_mcq_fifo
+        type: mcq
+        difficulty: easy
+        prompt: "If you enqueue [A, B, C] in that order, which element will be dequeued first?"
+        options:
+          - "C"
+          - "B"
+          - "A"
+          - "None"
+        correct_answer: 2
+        concepts: [FIFO, queue_behavior]
+
+      - id: queue_s1_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: easy
+        prompt: |
+          Queues follow FIFO (First-In-First-Out). The first element to enter
+          the queue is always the first one to leave.
+        concepts: [FIFO]
+
 # =========================================================
 # SLOT 2 — BUFFER & FLOW CONTROL
 # =========================================================
@@ -60,3 +91,597 @@ slots:
           def solve(arr, k):
               pass
         concepts: [deque, window_model]
+
+      - id: queue_s2_remediation
+        base_id: queue_s2_sliding_window
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Explain the 'Monotonic Queue' concept. 
+          Why do we remove elements from the tail that are smaller than the new incoming element? 
+          How does the head always stay the maximum?
+
+      - id: queue_s2_mcq_sliding_window
+        type: mcq
+        difficulty: medium
+        prompt: "In a sliding window problem, why is a Deque (Double-Ended Queue) often used?"
+        options:
+          - "To store all elements of the array"
+          - "To allow O(1) insertion and deletion from both ends"
+          - "To automatically sort the elements"
+          - "To reverse the array"
+        correct_answer: 1
+        concepts: [deque, sliding_window_optimization]
+
+      - id: queue_s2_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: medium
+        prompt: |
+          A deque allows us to remove stale elements from the front AND 
+          useless elements from the back in constant time, keeping the 
+          window processing efficient.
+        concepts: [deque_efficiency]
+
+# =========================================================
+# SLOT 3 — DISCOVERY ORDER (BFS)
+# =========================================================
+
+  - slot_id: QUEUE_SLOT_3_BFS_LOGIC
+    mental_install: "Queues naturally track 'frontiers' of discovery."
+    invariant: "Nodes are processed in non-decreasing order of distance from source."
+    mastery_signals:
+      - Explains why a queue keeps levels sorted
+      - Predicts the next node out in a multi-path graph
+    hard_failures:
+      - Uses a stack (DFS) for distance-based search
+
+    templates:
+      - id: queue_s3_bfs_explain
+        type: explanation
+        difficulty: medium
+        prompt: |
+          Why do we use a queue instead of a stack for Breadth-First Search? 
+          How does the FIFO property guarantee we find the shortest path in an unweighted graph?
+        rubric: "Must mention level-by-level exploration and distance preservation."
+        concepts: [bfs, shortest_path]
+
+      - id: queue_s3_remediation
+        base_id: queue_s3_bfs_explain
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Visualize 'Waves in a Pond'. 
+          Explain why the queue ensures ripples at distance $1$ are resolved before ripples at distance $2$.
+
+      - id: queue_s3_mcq_bfs
+        type: mcq
+        difficulty: medium
+        prompt: "Which property of a Queue ensures BFS finds the shortest path in an unweighted graph?"
+        options:
+          - "LIFO"
+          - "Random Access"
+          - "FIFO (exploring nodes in the order they were discovered)"
+          - "Priority sorting"
+        correct_answer: 2
+        concepts: [BFS, shortest_path, FIFO]
+
+      - id: queue_s3_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: easy
+        prompt: |
+          Because we process nodes in the order they were 'seen', we finish 
+          all nodes at distance 1 before moving to distance 2, ensuring we 
+          don't miss a closer path.
+        concepts: [level_level_search]
+
+# =========================================================
+# SLOT 4 — DUALITY (QUEUE FROM STACKS)
+# =========================================================
+
+  - slot_id: QUEUE_SLOT_4_STACK_CONVERSION
+    mental_install: "FIFO can be synthesized from LIFO via double-reversal."
+    invariant: "To get the oldest element, we must reverse the stack of new elements."
+    mastery_signals:
+      - Correctly manages 'in' and 'out' stacks
+      - Explains amortized O(1) for dequeue
+    hard_failures:
+      - Re-reverses the stack for every single operation (making it $O(n^2)$)
+
+    templates:
+      - id: queue_s4_two_stacks
+        type: coding
+        difficulty: medium
+        prompt: "Implement a Queue using two Stacks."
+        language: python
+        starter_code: |
+          class MyQueue:
+              def __init__(self): pass
+              def push(self, x): pass
+              def pop(self): pass
+              def peek(self): pass
+              def empty(self): pass
+        concepts: [conversions, amortized_analysis]
+
+      - id: queue_s4_remediation
+        base_id: queue_s4_two_stacks
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Explain the 'Double Flip' logic. 
+          If stack A is $[1, 2, 3]$ (top at $3$), show how moving them to stack B makes it $[3, 2, 1]$ (top at $1$).
+          Explain why we only move elements when the 'out' stack is empty.
+
+      - id: queue_s4_mcq_two_stacks
+        type: mcq
+        difficulty: medium
+        prompt: "When implementing a Queue with two Stacks (In-Stack and Out-Stack), when do you transfer elements from In to Out?"
+        options:
+          - "On every enqueue"
+          - "On every dequeue, even if Out-Stack isn't empty"
+          - "Only when a dequeue is requested and Out-Stack is empty"
+          - "Never"
+        correct_answer: 2
+        concepts: [stack_conversion, amortized_efficiency]
+
+      - id: queue_s4_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: medium
+        prompt: |
+          To maintain O(1) amortized time, we only flip the 'pancake stack' 
+          when we absolutely have to—which is when our 'ready-to-serve' 
+          (Out-Stack) is empty.
+        concepts: [amortization]
+
+# =========================================================
+# SLOT 5 — RESOURCE SCHEDULING
+# =========================================================
+
+  - slot_id: QUEUE_SLOT_5_SCHEDULING
+    mental_install: "Queues model 'fairness' in shared resource access."
+    invariant: "The node at the head is next in line for the CPU/Printer."
+    mastery_signals:
+      - Simulates cycle-based processing
+      - Re-enqueues unfinished tasks to the tail
+    hard_failures:
+      - Task starvation (losing a task from the loop)
+
+    templates:
+      - id: queue_s5_round_robin
+        type: coding
+        difficulty: medium
+        prompt: "Check how many seconds it takes for all people in a queue to buy tickets (1 per second)."
+        language: python
+        starter_code: |
+          def timeRequiredToBuy(tickets, k):
+              pass
+        concepts: [simulation, fairness]
+
+      - id: queue_s5_remediation
+        base_id: queue_s5_round_robin
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Explain the 'Fair Share' invariant. 
+          Trace why $[3, 1, 2]$ becomes $[1, 2, 2]$ after the first person buys a ticket and moves to the back.
+
+      - id: queue_s5_mcq_scheduling
+        type: mcq
+        difficulty: easy
+        prompt: "In a Round-Robin scheduler, what happens to a task that isn't finished after its time slice?"
+        options:
+          - "It is deleted"
+          - "It is moved to the head of the queue"
+          - "It is moved to the tail of the queue"
+          - "It waits in place"
+        correct_answer: 2
+        concepts: [scheduling, fairness, FIFO]
+
+      - id: queue_s5_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: easy
+        prompt: |
+          Fairness means everyone gets a turn. If you aren't done, you go to 
+          the back of the line so the next person can have their turn.
+        concepts: [preemption]
+
+# =========================================================
+# SLOT 6 — HIERARCHY FLATTENING
+# =========================================================
+
+  - slot_id: QUEUE_SLOT_6_LEVEL_ORDER
+    mental_install: "A queue converts a tree (hierarchy) into a sequence (timeline)."
+    invariant: "At any moment, the queue contains nodes from at most two adjacent levels."
+    mastery_signals:
+      - Uses 'size' snapshot to delineate levels
+      - Connects parent visitation to child discovery
+    hard_failures:
+      - Mixes nodes from level $k$ and level $k+2$
+
+    templates:
+      - id: queue_s6_binary_tree_level
+        type: coding
+        difficulty: medium
+        prompt: "Perform level order traversal of a binary tree (flat output or grouping)."
+        language: python
+        starter_code: |
+          def levelOrder(root):
+              pass
+        concepts: [trees, serialization]
+
+      - id: queue_s6_remediation
+        base_id: queue_s6_binary_tree_level
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Explain the 'Parent-Child handoff'. 
+          Why does popping a parent and immediately enqueuing its children naturally keep the tree levels separated?
+
+      - id: queue_s6_mcq_level_order
+        type: mcq
+        difficulty: medium
+        prompt: "During a level-order traversal, why do we use 'len(queue)' at the start of each level loop?"
+        options:
+          - "To know when the tree ends"
+          - "To process only the nodes that belong to the current level"
+          - "To allocate memory for the next level"
+          - "To count the leaves"
+        correct_answer: 1
+        concepts: [level_traversal, snapshot_logic]
+
+      - id: queue_s6_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: medium
+        prompt: |
+          Without a 'size snapshot', the loop would continue processing nodes as 
+          soon as it adds them (the children), mixing level 1 and level 2 together.
+        concepts: [level_separation]
+
+# =========================================================
+# SLOT 7 — PRIORITY INVARIANTS
+# =========================================================
+
+  - slot_id: QUEUE_SLOT_7_PRIORITY
+    mental_install: "Context matters; sometimes wait-time is less important than importance."
+    invariant: "Removal happens for the element with the highest priority, not the oldest."
+    mastery_signals:
+      - Compares Queue (FIFO) vs Priority Queue (Max/Min)
+      - Identifies use-cases like Task Spoolers vs Undo Buffers
+    hard_failures:
+      - Assumes Priority Queue is $O(1)$ for all operations
+
+    templates:
+      - id: queue_s7_priority_model
+        type: explanation
+        difficulty: easy
+        prompt: |
+          In an Emergency Room, would you use a standard FIFO Queue or a Priority Queue for triage? Why?
+        rubric: "Must reference severity-based sorting over arrival-order sorting."
+        concepts: [heuristics, ordering]
+
+      - id: queue_s7_remediation
+        base_id: queue_s7_priority_model
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Review the 'Urgency' invariant. 
+          Identify a situation where arrival order (FIFO) is unfair to a high-priority task.
+
+      - id: queue_s7_mcq_priority
+        type: mcq
+        difficulty: easy
+        prompt: "What is the key difference between a Priority Queue and a standard Queue?"
+        options:
+          - "Priority Queue is always faster"
+          - "Priority Queue removes the element with the highest priority first, not the oldest"
+          - "Priority Queue uses a stack internally"
+          - "There is no difference"
+        correct_answer: 1
+        concepts: [priority_queue, ordering]
+
+      - id: queue_s7_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: easy
+        prompt: |
+          A standard queue is 'first-come, first-served'. A priority queue 
+          is 'most-important, first-served'.
+        concepts: [heuristics]
+
+# =========================================================
+# SLOT 8 — WRAP-AROUND LOGIC
+# =========================================================
+
+  - slot_id: QUEUE_SLOT_8_CIRCULAR_INDEXING
+    mental_install: "Modulo arithmetic prevents 'memory leaks' in array-based queues."
+    invariant: "index = (index + 1) % capacity."
+    mastery_signals:
+      - Explains why simple incrementing causes the queue to hit the end of the array
+      - Traces the head and tail pointers through a wrap-around
+    hard_failures:
+      - Overwrites data at the front because tail didn't check for full status
+
+    templates:
+      - id: queue_s8_circular_math
+        type: explanation
+        difficulty: hard
+        prompt: |
+          Why do we use the modulo operator (%) in a circular queue implementation? 
+          What happens to the head pointer when it reaches the last index of the array?
+        rubric: "Must mention index wrap-around to 0 and re-using unoccupied space."
+        concepts: [modulo_arithmetic, memory_reuse]
+
+      - id: queue_s8_remediation
+        base_id: queue_s8_circular_math
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Explain 'The Clock Analogy'. 
+          Just as $12 + 1$ becomes $1$ on a clock, show why $index + 1 \pmod{size}$ allows an array to act as a never-ending loop (until full).
+
+      - id: queue_s8_mcq_modulo
+        type: mcq
+        difficulty: medium
+        prompt: "In a circular queue of size 5, if the tail is at index 4, where will the next element be enqueued?"
+        options:
+          - "Index 5"
+          - "Index 0 (if empty)"
+          - "An error occurs"
+          - "Index 1"
+        correct_answer: 1
+        concepts: [modulo_arithmetic, circular_buffers]
+
+      - id: queue_s8_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: medium
+        prompt: |
+          `(4 + 1) % 5 = 0`. The modulo operator 'wraps' the index back to the 
+          start of the array, letting us reuse the space we previously 
+          vacated by dequeuing.
+        concepts: [wrap_around]
+
+# =========================================================
+# SLOT 9 — DATA STREAMING
+# =========================================================
+
+  - slot_id: QUEUE_SLOT_9_MOVING_AVERAGE
+    mental_install: "Queues maintain a 'recent history' window over infinite streams."
+    invariant: "Window size $W$ is constant; as one enters, the oldest exit."
+    mastery_signals:
+      - Correctly updates running sum in $O(1)$
+      - Manages the 'eviction' of stale data
+    hard_failures:
+      - Re-sums the whole queue every time (violates $O(1)$ update)
+
+    templates:
+      - id: queue_s9_stream_avg
+        type: coding
+        difficulty: easy
+        prompt: "Implement a MovingAverage class that calculates the average of the last N numbers."
+        language: python
+        starter_code: |
+          class MovingAverage:
+              def __init__(self, size): pass
+              def next(self, val): pass
+        concepts: [streaming, stats]
+
+      - id: queue_s9_remediation
+        base_id: queue_s9_stream_avg
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Explain 'The Window' invariant. 
+          When a new value enters the sum, why must the oldest value leave for the window to remain consistent?
+          Show how to update $Sum$ in $O(1)$.
+
+      - id: queue_s9_mcq_sliding_avg
+        type: mcq
+        difficulty: easy
+        prompt: "Why is a Queue appropriate for calculating a moving average?"
+        options:
+          - "It sorts the data automatically"
+          - "It keeps track of the 'arrival order' so we can remove the oldest data"
+          - "It compresses the data"
+          - "It is faster than a list"
+        correct_answer: 1
+        concepts: [streaming_data, arrival_order]
+
+      - id: queue_s9_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: easy
+        prompt: |
+          Moving averages only care about the last N items. The FIFO property 
+          of a queue makes it trivial to identify and remove the 'stale' 
+          item that is no longer in the window.
+        concepts: [history_management]
+
+# =========================================================
+# SLOT 10 — LOGGING & TELEMETRY
+# =========================================================
+
+  - slot_id: QUEUE_SLOT_10_HIT_COUNTER
+    mental_install: "Time-based queues expire elements based on 'age' invariants."
+    invariant: "Queue tail always contains the most recent timestamp; head is the oldest."
+    mastery_signals:
+      - Prunes the queue head until `timestamp[head]` is within the valid window
+      - Uses double-ended queue (deque) properties for efficiency
+    hard_failures:
+      - Keeps all hits forever (leading to memory exhaustion)
+
+    templates:
+      - id: queue_s10_hit_counter
+        type: coding
+        difficulty: hard
+        prompt: "Design a HitCounter that counts requests in the last 5 minutes (300 seconds)."
+        language: python
+        starter_code: |
+          class HitCounter:
+              def __init__(self): pass
+              def hit(self, timestamp): pass
+              def getHits(self, timestamp): pass
+        concepts: [expiry, timestamps]
+
+      - id: queue_s10_remediation
+        base_id: queue_s10_hit_counter
+        type: explanation
+        variant: remediation
+        strategy: explanation
+        prompt: |
+          Visualize 'Data Expiry'. 
+          Explain why we clean the head of the queue during a `getHits` call—what happens to memory if we don't?
+
+      - id: queue_s10_mcq_expiry
+        type: mcq
+        difficulty: medium
+        prompt: "When implementating a hit counter for the last 5 minutes, what is the 'head' of your timestamp queue?"
+        options:
+          - "The most recent hit"
+          - "The summation of all hits"
+          - "The oldest hit that hasn't expired yet"
+          - "A random hit"
+        correct_answer: 2
+        concepts: [time_windows, expiry_logic]
+
+      - id: queue_s10_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: easy
+        prompt: |
+          In a FIFO queue, hits are added to the tail. Therefore, the hits 
+          waiting at the head are the oldest. To count hits in a window, we 
+          discard hits from the head that are too old.
+        concepts: [timestamp_management]
+
+# =========================================================
+# SLOT 11 — DOUBLE-ENDED DISCIPLINE (DEQUE)
+# =========================================================
+
+  - slot_id: QUEUE_SLOT_11_DEQUE_DESIGN
+    mental_install: "Deques (Double-Ended Queues) allow O(1) access to both the beginning and the end of a sequence."
+    invariant: "Adding or removing from either side must not invalidate indices of existing elements."
+    mastery_signals:
+      - Implements circular deque without using built-in deque
+      - Manages two pointers (front, rear) independently
+    hard_failures:
+      - Linear time O(n) for front operations
+      - Overwrites front when adding to rear in circular buffer
+
+    templates:
+      - id: queue_s11_design_deque
+        type: coding
+        difficulty: medium
+        prompt: "Design your implementation of the circular double-ended queue (deque)."
+        language: python
+        starter_code: |
+          class MyCircularDeque:
+              def __init__(self, k): pass
+              def insertFront(self, value): pass
+              def insertLast(self, value): pass
+              def deleteFront(self): pass
+              def deleteLast(self): pass
+        concepts: [deque, circular_buffer, memory_layout]
+
+      - id: queue_s11_remediation
+        type: explanation
+        variant: remediation
+        difficulty: medium
+        prompt: |
+          Think of a Deque as a tube that's open at both ends. 
+          1. How do you move 'front' back by one in a circular way? (Hint: (front - 1 + capacity) % capacity).
+          2. What happens to the 'rear' when you add a first element?
+        concepts: [modular_arithmetic]
+
+      - id: queue_s11_mcq_complexity
+        type: mcq
+        difficulty: medium
+        prompt: "What is the primary advantage of a Deque over a standard Queue?"
+        options:
+          - "It uses less memory"
+          - "Elements can be added/removed from BOTH ends in O(1) time"
+          - "It sorts elements automatically"
+          - "It is easier to implement with a single pointer"
+        correct_answer: 1
+        concepts: [deque_properties]
+
+      - id: queue_s11_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: medium
+        prompt: |
+          A standard queue is strictly 1-way (in at the back, out at the front).
+          A deque gives you the flexibility to use it like a stack OR a queue,
+          making it the ultimate linear access structure.
+        concepts: [flexibility]
+
+# =========================================================
+# SLOT 12 — THE MONOTONIC QUEUE
+# =========================================================
+
+  - slot_id: QUEUE_SLOT_12_MONOTONIC_QUEUE
+    mental_install: "Monotonic queues maintain a 'winner' at the head by pruning weaker elements at the tail."
+    invariant: "Elements are kept in deque such that their values are strictly decreasing (monotonically decreasing)."
+    mastery_signals:
+      - Solves 'Sliding Window Maximum' in O(n) time
+      - Correctly identifies when the 'winner' has slipped out of the window
+    hard_failures:
+      - Uses a heap (O(n log k)) instead of a monotonic queue (O(n))
+      - Forgets to remove the old head when the window shifts
+
+    templates:
+      - id: queue_s12_sliding_max
+        type: coding
+        difficulty: hard
+        prompt: "Find the maximum for each sliding window of size k in an array."
+        language: python
+        starter_code: |
+          def maxSlidingWindow(nums, k):
+              pass
+        concepts: [monotonic_queue, sliding_window, optimization]
+
+      - id: queue_s12_remediation
+        type: explanation
+        variant: remediation
+        difficulty: hard
+        prompt: |
+          Imagine a professional sports team. New talent (new elements) can 
+          replace older, weaker players immediately.
+          1. If the new player is 'stronger' than the players at the tail, why 
+             can we fire the tail players?
+          2. When does the strongest player (at the head) get retired?
+        concepts: [pruning_logic]
+
+      - id: queue_s12_mcq_efficiency
+        type: mcq
+        difficulty: hard
+        prompt: "Why is the monotonic queue O(n) for the sliding window problem?"
+        options:
+          - "Every element is pushed and popped at most once across the whole run"
+          - "It only processes elements when they are the maximum"
+          - "It uses a special hash map"
+          - "The window size k is small"
+        correct_answer: 0
+        concepts: [amortized_analysis]
+
+      - id: queue_s12_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: medium
+        prompt: |
+          Even though we check the queue multiple times inside the loop, 
+          each number from the original array is added once and removed once.
+          Total operations = 2 * N, which is O(N).
+        concepts: [optimization]

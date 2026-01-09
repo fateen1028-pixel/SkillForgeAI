@@ -45,15 +45,38 @@ slots:
                   pass
         concepts: [lifo, abstraction, controlled_access]
 
-      - id: stack_s1_explain_lifo
+      - id: stack_s1_remediation
         type: explanation
+        variant: remediation
         difficulty: easy
         prompt: |
-          Explain why function calls naturally follow stack order.
-          Describe what happens when nested calls return.
-        rubric: >
-          Must reference last-called-first-returned and execution frames.
-        concepts: [call_stack, execution_model]
+          A stack is like a stack of plates. You can only take the top one 
+          without breaking the pile.
+
+          1. If you push 'A' then 'B', what is on top?
+          2. Why can't you remove 'A' without removing 'B' first?
+        concepts: [lifo, abstraction]
+
+      - id: stack_s1_mcq_lifo
+        type: mcq
+        difficulty: easy
+        prompt: "Which element is removed first in a Stack?"
+        options:
+          - "The first element added"
+          - "The middle element"
+          - "The most recently added element"
+          - "A random element"
+        correct_answer: 2
+        concepts: [LIFO, stack_behavior]
+
+      - id: stack_s1_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: easy
+        prompt: |
+          Stacks follow LIFO (Last-In-First-Out). Think of a stack of trays;
+          the last tray you put on top is the first one you take off.
+        concepts: [LIFO]
 
 # =========================================================
 # SLOT 2 — REVERSAL & UNWINDING
@@ -82,105 +105,644 @@ slots:
               pass
         concepts: [reversal, deferred_state]
 
-      - id: stack_s2_parentheses
+      - id: stack_s2_remediation
+        type: explanation
+        variant: remediation
+        difficulty: easy
+        prompt: |
+          A stack is a 'reversal machine'. If you put numbers 1, 2, 3 in, 
+          they come out 3, 2, 1. 
+
+          1. How does the 'order of entry' relate to the 'order of exit'?
+          2. Why does the first item pushed become the last item popped?
+        concepts: [reversal, state_tracking]
+
+      - id: stack_s2_mcq_reverse
+        type: mcq
+        difficulty: easy
+        prompt: "If you push 'H', 'E', 'L', 'L', 'O' onto a stack, what is the first letter popped?"
+        options:
+          - "'H'"
+          - "'O'"
+          - "'E'"
+          - "'L'"
+        correct_answer: 1
+        concepts: [reversal, stack_ordering]
+
+      - id: stack_s2_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: easy
+        prompt: |
+          Since 'O' was the LAST letter added, it sits at the very top. 
+          Popping always takes the top item first.
+        concepts: [lifo_exit]
+
+# =========================================================
+# SLOT 3 — NESTED BALANCING
+# =========================================================
+
+  - slot_id: STACK_SLOT_3_BALANCING
+    mental_install: "Stacks handle nested structures by pausing the outer context until the inner context is resolved."
+    invariant: "The most recent opening symbol must be the first one closed."
+    mastery_signals:
+      - Validates complex nested delimiters ([], {}, ())
+      - Tracks max nesting depth
+    hard_failures:
+      - Popping from an empty stack (Stack Underflow)
+      - Forgetting to check if stack is empty at the end
+
+    templates:
+      - id: stack_s3_parentheses
         type: coding
         difficulty: medium
-        prompt: "Check if parentheses are balanced."
+        prompt: "Determine if a string of brackets '()[]{}' is valid."
         language: python
         starter_code: |
-          def solve(s):
+          def isValid(s):
               pass
         concepts: [state_tracking, matching, invariants]
 
-      - id: stack_s2_unwind_explain
+      - id: stack_s3_remediation
         type: explanation
+        variant: remediation
         difficulty: medium
         prompt: |
-          Trace the stack state for the string: '([{}])'.
-          Show stack contents after each character.
-        rubric: >
-          Must show push/pop sequence and empty end state.
-        concepts: [stack_trace, invariants]
+          Think of brackets like conversations. You can't end a conversation 
+          that never started, and you must finish the current conversation 
+          before going back to the previous one.
+
+          1. Why does seeing a ')' require you to check the stack's top?
+          2. What does it mean if the stack is still full after the string ends?
+        concepts: [nesting, delimiter_matching]
+
+      - id: stack_s3_mcq_balance
+        type: mcq
+        difficulty: medium
+        prompt: "In the string '([)]', why is it considered invalid?"
+        options:
+          - "It has an equal number of opening and closing brackets"
+          - "The closing ']' appears before its corresponding '('"
+          - "The closing ')' does not match the most recent opening bracket '['"
+          - "The string is too short"
+        correct_answer: 2
+        concepts: [nested_validation, lifo]
+
+      - id: stack_s3_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: medium
+        prompt: |
+          Even though all brackets have partners, the order is wrong. 
+          The '[' was the last one opened, so the very next closing bracket 
+          MUST be a ']'.
+        concepts: [order_invariant]
 
 # =========================================================
-# SLOT 3 — MONOTONIC & STRUCTURAL STACKS
+# SLOT 4 — STATE TRACKING (MIN STACK)
 # =========================================================
 
-  - slot_id: STACK_SLOT_3_MONOTONIC
-    mental_install: "Stacks can enforce global structural invariants across sequences."
-    invariant: "Stack maintains ordered property across pushes."
+  - slot_id: STACK_SLOT_4_STATE_TRACKING
+    mental_install: "Stacks can store composite state to maintain global properties in O(1)."
+    invariant: "The auxiliary stack always reflects the property (e.g., minimum) of the main stack."
     mastery_signals:
-      - Builds monotonic stacks
-      - Explains invariant preservation
-      - Uses stack to skip work
+      - Synchronizes main stack and min stack on every push/pop
+      - Detects the need for redundant state storage
     hard_failures:
-      - Treats as brute-force helper
-      - Cannot explain popping logic
-      - Breaks monotonic invariant
+      - Searches the whole stack for minimum (violates $O(1)$)
+      - Fails to pop from min stack when the main stack pops a minimum element
 
     templates:
-      - id: stack_s3_next_greater
+      - id: stack_s4_min_stack
         type: coding
         difficulty: medium
-        prompt: "For each element, find the next greater element to the right."
+        prompt: "Design a stack that supports push, pop, top, and retrieving the minimum element in constant time."
         language: python
         starter_code: |
-          def solve(nums):
-              pass
-        concepts: [monotonic_stack, invariant, optimization]
+          class MinStack:
+              def __init__(self): pass
+              def push(self, val): pass
+              def pop(self): pass
+              def top(self): pass
+              def getMin(self): pass
+        concepts: [composite_state, invariants]
 
-      - id: stack_s3_histogram
+      - id: stack_s4_remediation
+        type: explanation
+        variant: remediation
+        difficulty: medium
+        prompt: |
+          If we just track one `min` variable, what happens when we pop the 
+          current minimum? We lose the history!
+
+          1. Why does a 'history stack' help you remember what the minimum *was*?
+          2. When should you push onto the MinStack vs just the MainStack?
+        concepts: [history_tracking, state_history]
+
+      - id: stack_s4_mcq_min_stack
+        type: mcq
+        difficulty: medium
+        prompt: "In a MinStack, if you push [10, 5, 8], what is the top of the min_stack?"
+        options:
+          - "10"
+          - "5"
+          - "8"
+          - "Empty"
+        correct_answer: 1
+        concepts: [min_stack, state_tracking]
+
+      - id: stack_s4_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: easy
+        prompt: |
+          Even after pushing 8, the value 5 remains the minimum. The min_stack 
+          tracks the 'best' value seen so far for every level of the main stack.
+        concepts: [invariants]
+
+# =========================================================
+# SLOT 5 — POSTFIX EVALUATION (RPN)
+# =========================================================
+
+  - slot_id: STACK_SLOT_5_EVALUATION
+    mental_install: "Stacks resolve operators by postponing them until operands are available."
+    invariant: "An operator consumes $N$ operands from the top and pushes the result back."
+    mastery_signals:
+      - Traces operand/operator precedence
+      - Handles multi-digit numbers or complex tokens
+    hard_failures:
+      - Applies operator in wrong order (e.g., $3 - 5$ vs $5 - 3$)
+      - Forgets to push the result back
+
+    templates:
+      - id: stack_s5_postfix
+        type: coding
+        difficulty: medium
+        prompt: "Evaluate the value of an arithmetic expression in Reverse Polish Notation (Postfix)."
+        language: python
+        starter_code: |
+          def evalRPN(tokens):
+              pass
+        concepts: [postfix, operator_precedence]
+
+      - id: stack_s5_remediation
+        type: explanation
+        variant: remediation
+        difficulty: medium
+        prompt: |
+          In Postfix (`3 4 +`), the operator comes AFTER the numbers. 
+
+          1. Which operand should be the 'left' side of a minus operation?
+          2. What happens to the operator once the math is done?
+        concepts: [postfix_logic]
+
+      - id: stack_s5_mcq_postfix_eval
+        type: mcq
+        difficulty: medium
+        prompt: "Evaluate the RPN expression: ['2', '1', '+', '3', '*']"
+        options:
+          - "5"
+          - "9"
+          - "6"
+          - "3"
+        correct_answer: 1
+        concepts: [postfix_calculation]
+
+      - id: stack_s5_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: easy
+        prompt: |
+          (2 + 1) = 3. Then [3, 3, *] becomes (3 * 3) = 9. 
+          The stack effectively converts 'inner' operations into results for 'outer' ones.
+        concepts: [operation_flow]
+
+# =========================================================
+# SLOT 6 — EXPRESSION CONVERSION
+# =========================================================
+
+  - slot_id: STACK_SLOT_6_CONVERSION
+    mental_install: "Stacks can reorder sequences based on precedence rules."
+    invariant: "Higher precedence operators must be resolved before lower ones."
+    mastery_signals:
+      - Implements simplified Shunting-Yard
+      - Handles operator precedence (* > +)
+    hard_failures:
+      - Implements conversion without considering order of operations
+      - Mismanages parentheses in conversion
+
+    templates:
+      - id: stack_s6_shunting_yard_basics
         type: coding
         difficulty: hard
-        prompt: "Find the largest rectangle in a histogram."
+        prompt: "Convert an infix expression (like 'a+b*c') to postfix ('abc*+')."
         language: python
         starter_code: |
-          def solve(heights):
+          def infixToPostfix(exp):
+              # Assume single characters, handle + and * only
               pass
-        concepts: [monotonic_stack, boundary_control, optimization]
+        concepts: [precedence, reordering]
 
-      - id: stack_s3_invariant_explain
+      - id: stack_s6_remediation
         type: explanation
+        variant: remediation
         difficulty: hard
         prompt: |
-          Explain why a monotonic decreasing stack allows you to solve
-          Next Greater Element in linear time.
-        rubric: >
-          Must reference one-pass processing and invariant preservation.
-        concepts: [complexity_reasoning, invariant]
+          Why do we need a stack to convert Infix to Postfix? 
+
+          1. If you see 'a + b * c', why can't you output the '+' immediately?
+          2. How does the stack 'hold' an operator until it knows if something 
+             more important (higher precedence) is coming?
+        concepts: [precedence_buffering]
+
+      - id: stack_s6_mcq_precedence
+        type: mcq
+        difficulty: hard
+        prompt: "During Infix-to-Postfix conversion, if you encounter a '+' and the stack top is '*', what do you do?"
+        options:
+          - "Push '+' on top of '*'"
+          - "Pop '*' and output it, then push '+'"
+          - "Ignore the '+'"
+          - "Pop everything and stop"
+        correct_answer: 1
+        concepts: [shunting_yard, operator_precedence]
+
+      - id: stack_s6_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: medium
+        prompt: |
+          Since '*' has higher precedence than '+', it must be 'discharged' to 
+          the output first. You cannot place a weaker operator on top of a 
+          stronger one.
+        concepts: [stack_rules]
 
 # =========================================================
-# SLOT 4 — RECURSION & CALL-STACK MODELING (ADVANCED)
+# SLOT 7 — DATA STRUCTURE SIMULATION
 # =========================================================
 
-  - slot_id: STACK_SLOT_4_CALL_STACK
-    mental_install: "Recursion is implicit stack manipulation."
+  - slot_id: STACK_SLOT_7_SIMULATION
+    mental_install: "Two stacks can simulate a queue by reversing the reversal."
+    invariant: "Elements are moved from the 'input' stack to the 'output' stack to maintain FIFO order."
+    mastery_signals:
+      - Implements Queue using two Stacks
+      - Explains amortized O(1) time complexity
+    hard_failures:
+      - Moves elements back and forth on every push (inefficient)
+      - Forgets to only move items when the output stack is empty
+
+    templates:
+      - id: stack_s7_queue_using_stacks
+        type: coding
+        difficulty: medium
+        prompt: "Implement a FIFO queue using two stacks."
+        language: python
+        starter_code: |
+          class MyQueue:
+              def __init__(self):
+                  self.input = []
+                  self.output = []
+              def push(self, x): pass
+              def pop(self): pass
+              def peek(self): pass
+              def empty(self): pass
+        concepts: [amortization, simulation, lifo_vs_fifo]
+
+      - id: stack_s7_remediation
+        type: explanation
+        variant: remediation
+        difficulty: medium
+        prompt: |
+          To turn a stack (LIFO) into a queue (FIFO), you need to flip the 
+          order. 
+
+          1. If you pour water from one cup to another, the bottom becomes the top.
+          2. Why should you only 'flip' the input stack when the output stack 
+             is completely empty?
+        concepts: [order_reversal]
+
+      - id: stack_s7_mcq_queue_stacks
+        type: mcq
+        difficulty: medium
+        prompt: "In a Queue-from-Stacks implementation, when is the best time to move elements from the 'Push' stack to the 'Pop' stack?"
+        options:
+          - "Every time a push occurs"
+          - "Only when the 'Pop' stack is empty during a pop/peek operation"
+          - "Only when the 'Push' stack is full"
+          - "Every time a pop occurs"
+        correct_answer: 1
+        concepts: [efficiency, amortization]
+
+      - id: stack_s7_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: medium
+        prompt: |
+          Moving elements takes O(N) time. By only doing it when the out-stack 
+          is empty, we ensure that each element is moved exactly once, 
+          leading to an 'average' or amortized cost of O(1).
+        concepts: [amortized_analysis]
+
+# =========================================================
+# SLOT 8 — RECURSION & CALL-STACK MODELING
+# =========================================================
+
+  - slot_id: STACK_SLOT_8_CALL_STACK
+    mental_install: "Recursion is implicit stack manipulation managed by the OS/Runtime."
     invariant: "Each recursive call pushes a frame; return pops it."
     mastery_signals:
-      - Simulates recursion with stack
-      - Explains stack overflow
-      - Converts recursion to iteration
+      - Simulates recursion with an explicit stack
+      - Explains stack overflow as memory exhaustion
     hard_failures:
       - Treats recursion as magic
-      - Cannot trace call frames
-      - Breaks termination logic
+      - Cannot trace call frames manually
 
     templates:
-      - id: stack_s4_simulate_recursion
+      - id: stack_s8_factorial_sim
         type: coding
         difficulty: hard
         prompt: "Implement factorial using an explicit stack, not recursion."
         language: python
         starter_code: |
-          def solve(n):
+          def factorial(n):
+              # Use a list as a stack
               pass
-        concepts: [call_stack, simulation, control_flow]
+        concepts: [call_stack, simulation]
 
-      - id: stack_s4_trace_calls
+      - id: stack_s8_remediation
         type: explanation
+        variant: remediation
         difficulty: hard
         prompt: |
-          Draw the call stack evolution for factorial(4).
-        rubric: >
-          Must show frames pushed and popped with values.
-        concepts: [execution_trace, call_stack]
+          Recursion is just the computer taking 'notes' on what to do next.
+
+          1. What information must be on each 'note' (stack frame)?
+          2. How do you 'return' a value to the caller using a manual stack?
+        concepts: [stack_frames]
+
+      - id: stack_s8_mcq_overflow
+        type: mcq
+        difficulty: hard
+        prompt: "What causes a 'Stack Overflow' error in a recursive function?"
+        options:
+          - "Too many items in a list"
+          - "The computer runs out of dedicated stack memory because too many function frames are pushed without being popped"
+          - "The function returns too many values"
+          - "Variable names are too long"
+        correct_answer: 1
+        concepts: [stack_overflow, memory_limits]
+
+      - id: stack_s8_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: medium
+        prompt: |
+          The 'Stack' in memory has a fixed size. If you keep calling functions 
+          (pushing frames) without ever returning (popping frames), you 
+          eventually run out of room.
+        concepts: [system_limits]
+
+# =========================================================
+# SLOT 9 — ITERATIVE TRAVERSAL
+# =========================================================
+
+  - slot_id: STACK_SLOT_9_TRAVERSAL
+    mental_install: "Iterative depth-first search (DFS) uses an explicit stack to mimic recursion."
+    invariant: "The stack stores the path from the root to the current frontier."
+    mastery_signals:
+      - Implements iterative Tree traversal (Pre-order)
+      - Manages visitation order (push right child, then left)
+    hard_failures:
+      - Pushes children in wrong order (resulting in right-to-left traversal)
+      - Fails to handle null children
+
+    templates:
+      - id: stack_s9_iterative_preorder
+        type: coding
+        difficulty: hard
+        prompt: "Implement Pre-order traversal of a binary tree iteratively using a stack."
+        language: python
+        starter_code: |
+          def preorderTraversal(root):
+              # Return list of values
+              pass
+        concepts: [dfs, tree_traversal, flow_control]
+
+      - id: stack_s9_remediation
+        type: explanation
+        variant: remediation
+        difficulty: hard
+        prompt: |
+          When converting recursion to a stack for trees, you have to think 
+          about which child you want to visit FIRST.
+
+          1. If you want to go LEFT first, which child should you push into 
+             the stack LAST?
+          2. Why does the stack naturally create a 'Depth-First' pattern?
+        concepts: [visitation_order]
+
+      - id: stack_s9_mcq_traversal_order
+        type: mcq
+        difficulty: hard
+        prompt: "To achieve a Left-to-Right Pre-order traversal using a stack, in what order should you push a node's children?"
+        options:
+          - "Left child first, then Right child"
+          - "Right child first, then Left child"
+          - "It doesn't matter"
+          - "Push both at the same time"
+        correct_answer: 1
+        concepts: [dfs, lifo_logic]
+
+      - id: stack_s9_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: medium
+        prompt: |
+          Because stacks are LIFO, the LAST item you push is the FIRST one 
+          processed. If you want to visit the Left child first, you must 
+          push the Right child first so it waits at the bottom.
+        concepts: [ordering]
+
+# =========================================================
+# SLOT 10 — MONOTONIC BASICS
+# =========================================================
+
+  - slot_id: STACK_SLOT_10_MONOTONIC_BASIC
+    mental_install: "Stacks can enforce global structural invariants across sequences to solve 'nearest' problems."
+    invariant: "The stack maintains a sorted order (strictly increasing or decreasing) by popping violators."
+    mastery_signals:
+      - Builds monotonic stacks for 'Next Greater Element'
+      - Identifies the linear time complexity $O(N)$
+    hard_failures:
+      - Uses nested $O(N^2)$ loops instead of a stack
+      - Popping in the wrong direction (e.g., keeping smaller elements instead of larger)
+
+    templates:
+      - id: stack_s10_next_greater
+        type: coding
+        difficulty: medium
+        prompt: "For each element in an array, find the next greater element to its right."
+        language: python
+        starter_code: |
+          def nextGreaterElement(nums):
+              pass
+        concepts: [monotonic_stack, optimization]
+
+      - id: stack_s10_remediation
+        type: explanation
+        variant: remediation
+        difficulty: medium
+        prompt: |
+          Imagine a line of people looking to the right. A tall person blocks 
+          the view of everyone shorter behind them.
+
+          1. If you see someone taller than the 'top' of your stack, what have 
+             you just found for that top person?
+          2. Why is it safe to 'forget' (pop) someone once you find their 
+             Next Greater Element?
+        concepts: [pruning, visual_logic]
+
+      - id: stack_s10_mcq_monotonic_goal
+        type: mcq
+        difficulty: medium
+        prompt: "Why is a monotonic stack efficient for 'Next Greater Element'?"
+        options:
+          - "It sorts the entire array first"
+          - "Each element is pushed and popped at most once, leading to O(N) time"
+          - "It uses less memory than a list"
+          - "It allows random access to all elements"
+        correct_answer: 1
+        concepts: [complexity, linear_time]
+
+      - id: stack_s10_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: medium
+        prompt: |
+          Even though there is a loop inside a loop (while inside for), no 
+          element ever goes back into the stack once it's popped. Every 
+          number has a 1-way trip through the stack.
+        concepts: [amortized_analysis]
+
+# =========================================================
+# SLOT 11 — MONOTONIC GEOMETRY
+# =========================================================
+
+  - slot_id: STACK_SLOT_11_MONOTONIC_ADV
+    mental_install: "Monotonic stacks can find both left and right boundaries simultaneously."
+    invariant: "The element below the 'top' in the stack is the 'Previous Smaller/Greater' neighbor."
+    mastery_signals:
+      - Solves 'Largest Rectangle in Histogram'
+      - Uses the stack to identify limited ranges
+    hard_failures:
+      - Fails to handle the end of the array (forgetting to process remaining elements)
+      - Calculation of width is off by one
+
+    templates:
+      - id: stack_s11_histogram
+        type: coding
+        difficulty: hard
+        prompt: "Find the area of the largest rectangle in a histogram."
+        language: python
+        starter_code: |
+          def largestRectangleArea(heights):
+              pass
+        concepts: [monotonic_stack, geometry, boundary_control]
+
+      - id: stack_s11_remediation
+        type: explanation
+        variant: remediation
+        difficulty: hard
+        prompt: |
+          A rectangle's height is limited by the shortest bar in its range. 
+
+          1. When you pop a bar from the stack, how do you know how far left 
+             that bar could have extended? (Hint: look at the new top).
+          2. How do you handle the very last bars left in the stack?
+        concepts: [boundary_logic]
+
+      - id: stack_s11_mcq_histogram_width
+        type: mcq
+        difficulty: hard
+        prompt: "In the histogram problem, if we pop bar 'i', what defines its left boundary?"
+        options:
+          - "Index 0"
+          - "The index of the element currently at the top of the stack (after the pop)"
+          - "i - 1"
+          - "The right boundary"
+        correct_answer: 1
+        concepts: [boundary_identification]
+
+      - id: stack_s11_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: medium
+        prompt: |
+          The stack only contains bars that are 'smaller' than the ones above 
+          them. So, the bar underneath 'i' in the stack is the first bar to 
+          the left that is shorter than bar 'i'.
+        concepts: [geometric_invariants]
+
+# =========================================================
+# SLOT 12 — MULTI-STACK SYSTEMS
+# =========================================================
+
+  - slot_id: STACK_SLOT_12_MULTI_STACK
+    mental_install: "A single array can host multiple independent stacks through careful index management."
+    invariant: "The 'free' list tracks available slots, while 'top' pointers track stack heads."
+    mastery_signals:
+      - Implements 3-stacks-in-1-array
+      - Manages a 'free' list pointers to prevent data collision
+    hard_failures:
+      - Stacks 'overwrite' each other due to static division
+      - Complexity of push/pop becomes $O(N)$ instead of $O(1)$
+
+    templates:
+      - id: stack_s12_three_in_one
+        type: coding
+        difficulty: hard
+        prompt: "Implement three stacks using a single array of size N."
+        language: python
+        starter_code: |
+          class MultiStack:
+              def __init__(self, stack_size):
+                  pass
+              def push(self, stackNum, value): pass
+              def pop(self, stackNum): pass
+        concepts: [memory_management, pointer_logic]
+
+      - id: stack_s12_remediation
+        type: explanation
+        variant: remediation
+        difficulty: hard
+        prompt: |
+          Storing multiple stacks in one array is about space efficiency. 
+
+          1. If you just divide the array into 3 equal parts, what happens if 
+             one stack gets full but the others are empty?
+          2. How can a 'linked list of free spots' let you use any empty 
+             space for any stack?
+        rubric: "Must mention dynamic allocation of indices."
+        concepts: [space_optimization]
+
+      - id: stack_s12_mcq_division
+        type: mcq
+        difficulty: hard
+        prompt: "What is the main disadvantage of 'Fixed Division' (splitting an array into N equal parts) for multiple stacks?"
+        options:
+          - "It is too slow"
+          - "One stack can be 'full' while the array still has empty space"
+          - "It is impossible to implement"
+          - "It requires extra memory"
+        correct_answer: 1
+        concepts: [memory_allocation, tradeoffs]
+
+      - id: stack_s12_remediation_mcq
+        type: explanation
+        variant: remediation
+        difficulty: medium
+        prompt: |
+          Fixed division is rigid. If Stack A is huge and Stack B is tiny, 
+          Stack A will error out even if the total array is mostly empty. 
+          Flexible pointer-based management avoids this wasted space.
+        concepts: [flexibility]

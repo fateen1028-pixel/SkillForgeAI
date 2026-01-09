@@ -27,9 +27,9 @@ export default function TasksPage() {
     return (
       <div className="min-h-screen bg-[#030712] text-white flex items-center justify-center">
         <div className="relative">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-violet-500"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="h-2 w-2 bg-violet-500 rounded-full animate-pulse"></div>
+            <div className="h-2 w-2 bg-emerald-500 rounded-full animate-pulse"></div>
           </div>
         </div>
       </div>
@@ -60,7 +60,7 @@ export default function TasksPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#030712] text-white selection:bg-violet-500/30">
+    <div className="min-h-screen bg-[#030712] text-white selection:bg-emerald-500/30">
       {/* Background Ambience */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute top-[-10%] right-[-5%] w-125 h-125 bg-violet-600/10 rounded-full blur-[120px]" />
@@ -97,7 +97,7 @@ export default function TasksPage() {
               className="space-y-6"
             >
               <div className="flex items-center gap-4">
-                <div className="h-10 w-10 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-violet-400 font-bold font-mono">
+                <div className="h-10 w-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold font-mono">
                   {index + 1}
                 </div>
                 <div>
@@ -105,7 +105,7 @@ export default function TasksPage() {
                     {phase.name}
                     <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium uppercase tracking-wide border ${
                         phase.phase_status === 'active' 
-                        ? 'bg-violet-500/10 text-violet-300 border-violet-500/20' 
+                        ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20' 
                         : 'bg-slate-800/50 text-slate-400 border-slate-700'
                     }`}>
                         {phase.phase_status}
